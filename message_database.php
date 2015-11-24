@@ -1,4 +1,3 @@
-<?include('template/header.php');?>
 <div class="column-group half-vertical-space">
 	<div class="column all-25">
 	</div>
@@ -10,4 +9,3 @@
 		<li>Breathe deep and wait an hour</li>
 	</div>
 </div>
-<?}?>

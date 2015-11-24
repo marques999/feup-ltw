@@ -7,16 +7,110 @@
 		$thisError = $_GET['error'];
 	}
 ?>
+
 <script>
-	$(document).ready(function() {
-		$('#nav_profile').addClass('active');
+$(document).ready(function() {
+	$('#nav_profile').addClass('active');
+	$("#country-list option").remove();
+	$.getJSON("json/countries.json", function(data) {  	
+		$.each(data, function(index, item) {
+    		$("#country-list").append($("<option></option>").text(item).val(index));
+		});
 	});
+});
+
+var wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
+var fileInput = $(':file').wrap(wrapper);
+
+fileInput.change(function(){
+    readURL(this);
+})
+
+$('#file').click(function(){
+    fileInput.click();
+}).show();
+
+function readURL(input) {
+	if (input.files && input.files[0]) {
+	    
+	    var goUpload = true;
+	    var uploadFile = input.files[0];
+	    
+	    if (!(/\.(bmp|gif|jpg|jpeg|png)$/i).test(uploadFile.name)) {
+	        $('#file').effect("shake");
+	        $('#file').text('You must select an image file only');
+	       
+	        setTimeout(function() {
+	        	$('#file').text('Choose an avatar...');
+	     	} ,5000);
+	        
+	        return false;
+	    }
+	   
+	    if (uploadFile.size > 2000000) { // 2mb
+	        $('#file').text('Please upload a smaller image, max size is 2 MB');
+	        
+	        setTimeout(function() {
+	        	$('#file').text('Choose an avatar...');
+	        }, 5000);
+	        
+	        return false;
+	    }
+
+        $('#file').text("Uploading "+uploadFile.name);
+
+        var reader = new FileReader();
+        
+        reader.onload = function (e) {
+            
+            $('#blah').attr('src', e.target.result);
+
+            var width = $('#blah').width(); // Current image width
+            var height = $('#blah').height(); // Current image height
+
+            if (width > 200 || height > 200) {
+                
+                if (width > height) {
+                    var ratio = width / height; // get ratio for scaling image
+                    var newWidth = 120 * ratio;
+                    var margin = '-' + (newWidth - 120) /2 + 'px';
+                    $('img#blah').css("width", newWidth + 'px'); // Set new width
+                    $('img#blah').css("height", '120px'); // Scale height based on ratio
+                    $('#blah').css("margin-left", margin);
+                }
+                
+                if (height > width) {
+                    var ratio = height / width; // get ratio for scaling image
+                    var newHeight = 120 * ratio;
+                    var margin = '-' + (newHeight - 120) /2 + 'px';
+                    $('img#blah').css("height", newHeight + 'px'); // Set new width
+                    $('img#blah').css("width", '120px'); // Scale height based on ratio
+                    $('#blah').css("margin-top", margin);
+                }
+
+                $('#file').text(uploadFile.name);
+            }
+            else {
+                $('#file').text("Minimum file size: 120x120px");
+                
+                setTimeout(function() {
+                	$('#file').text('Choose file');
+                }, s5000);
+            }
+        }
+
+        reader.readAsDataURL(uploadFile);
+	}
+}
+
+
 </script>
+
 <div class="ink-grid all-80 medium-90 small-100 tiny-100">
 <div class="column-group vertical-space">
 	<div class="column all-20 large-10 medium-10 small-0 tiny-0">
 	</div>
-	<form action="action_create_user.php" method="POST" class="ink-form ink-formvalidator">
+	<form action="actions/action_create_user.php" method="POST" class="ink-form ink-formvalidator">
 		<fieldset>
 			<legend class="align-center">Register Account</legend>
 			<div class="control-group required column-group half-gutters">
@@ -63,11 +157,7 @@
 					<input type="text" name="location" data-rules="required">
 				</div>
 				<div class="control all-30">
-					<select>
-						<option value="Portugal">Volvo</option>
-						<option value="Spain">Saab</option>
-						<option value="Turkey">Mercedes</option>
-						<option value="Ukraine">Audi</option>
+					<select name="country" id="country-list">
 					</select>
 				</div>
 			</div>
@@ -98,4 +188,6 @@
 	</div>
 </div>
 </div>
-<?include('template/footer.php')?>
+<?
+	include('template/footer.php');
+?>

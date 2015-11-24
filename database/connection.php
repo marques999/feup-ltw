@@ -1,3 +1,3 @@
 <?
-    $db = new PDO('sqlite:events.db');
+	$db = new PDO('sqlite:./events.db');
 ?>

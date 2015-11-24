@@ -1,6 +1,9 @@
 body {
 	background: #ededed;
 	margin: 0;
+	min-height: 100%;
+	height: 100%;
+	margin-bottom: 100px;
 }
 
 b, strong {
@@ -19,6 +22,7 @@ b, strong {
 
 header {
 	display: block;
+	position: relative;
 	margin-bottom: 2em;
 }
 
@@ -42,6 +46,14 @@ h3 {
 	margin-bottom: 0.87em;
 }
 
+nav.fixed-header {
+	position: fixed;
+	left:0;
+	top: 0;
+	width: 100%; 
+	z-index: 1;
+}
+
 h4 {
 	font-size: 1.25em;
 	font-weight: 700;
@@ -55,7 +67,6 @@ h5, h6 {
 	margin-top: 0;
 	margin-bottom: 1.18636em;
 }
-
 
 header h1 {
 	padding: 0.5em 0;
@@ -71,6 +82,10 @@ header h1 small:before  {
 
 footer {
 	background: #ccc;
+	bottom: 0;
+	clear: both;
+	position: fixed;
+	width: 100%;
 }
 
 img {
@@ -339,6 +354,10 @@ figure.ink-image > figcaption {
 .quarter-horizontal-padding {
 	padding-left: 0.3125em;
 	padding-right: 0.3125em;
+}
+
+div.gmaps {
+	height: 400px;
 }
 /*********************/
 .slab {

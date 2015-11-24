@@ -275,15 +275,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             this._elementHadDataRules = this._element.hasAttribute('data-rules');
         },
 
-        /**
-         * Function to get the label that identifies the field.
-         * If it can't find one, it will use the name or the id
-         * (depending on what is defined)
-         *
-         * @method _getLabel
-         * @return {String} Label to be used in the error messages
-         * @private
-         */
         _getLabel: function(){
             var label = Element.findUpwardsBySelector(this._element,'.control-group label');
 
@@ -294,14 +285,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             }
         },
 
-        /**
-         * Function to parse a rules' string.
-         * Ex: required|number|max_length[30]
-         *
-         * @method _parseRules
-         * @param  {String} rules String with the rules
-         * @private
-         */
         _parseRules: function( rules ){
             this._rules = {};
             rules = rules.split("|");
@@ -336,19 +319,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             }
         },
 
-        /**
-         * Function to add an error to the FormElement's 'errors' object.
-         * It basically receives the rule where the error occurred, the parameters passed to it (if any)
-         * and the error message.
-         * Then it replaces some tokens in the message for a more 'custom' reading
-         *
-         * @method _addError
-         * @param  {Object} opt Options object, containing either `rule` or `message`, below:
-         * @param  {String} [rule] The rule that called for this error. Used to find a message.
-         * @param  {String} [messag] The raw error message.
-         * @private
-         * @static
-         */
         _addError: function(opt){
             if (typeof opt === 'string') { opt = { rule: opt }; }
             var rule = opt.rule;
@@ -384,45 +354,18 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             this._errors[rule] = message;
         },
 
-        /**
-         * Gets an element's value
-         *
-         * @method getValue
-         * @return {mixed} The DOM Element's value
-         * @public
-         */
         getValue: function(){
             return getValue(this._element);
         },
 
-        /**
-         * Gets this FormElement's display label, as passed to the error messages.
-         *
-         * @method getLabel
-         * @return {String} The label string, from the name, id or data-label
-         **/
         getLabel: function () {
             return this._options.label;
         },
 
-        /**
-         * Gets the constructed errors' object.
-         *
-         * @method getErrors
-         * @return {Object} Errors' object
-         * @public
-         */
         getErrors: function(){
             return this._errors;
         },
 
-        /**
-         * Gets the DOM element related to the instance.
-         *
-         * @method getElement
-         * @return {Object} DOM Element
-         * @public
-         */
         getElement: function(){
             return this._element;
         },

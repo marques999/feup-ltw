@@ -1,16 +1,27 @@
 <?
     include_once('database/connection.php');
     include_once('database/events.php');
+    include_once('database/salt.php');
+    include_once('database/users.php');
     include('template/header.php');
 
+    $currentDate = time();
     $featuredEvent = events_randomEvent();
-    $result = events_listTopEvents(4);
+    
+    if ($loggedIn) {
+        $upcomingEvents = users_listFutureEvents($thisUser, $currentDate);
+    }
+    else {
+        $upcomingEvents = events_listTopEvents(10);
+    }
 ?>
+
 <script>
     $(document).ready(function() {
         $('#nav_index').addClass('active');
     });
 </script>
+
 <div class="ink-grid vertical-space">
 <div class="panel half-vertical-space">   
     <div id="car3" class="ink-carousel xlarge-100 large-100 medium-100 small-100 tiny-100">
@@ -35,4 +46,7 @@
     </div>
 </div>
 </div>
-<?include('template/footer.php')?>
+
+<?
+    include('template/footer.php')
+?>
