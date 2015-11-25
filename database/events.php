@@ -1,4 +1,5 @@
 <?php
+
 	function events_listPublic() {		
 		global $db;
 		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 0');
@@ -78,9 +79,7 @@
 
 	function events_randomEvent() {
 		global $db;
-		$stmt = $db->prepare('SELECT * FROM Events 
-								WHERE private = 0
-								ORDER BY RANDOM() LIMIT 1');
+		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 0 ORDER BY RANDOM() LIMIT 1');
 		$stmt->execute();
 		return $stmt->fetch();
 	}
@@ -95,7 +94,6 @@
 								LIMIT :topResults');
 		$stmt->bindParam(':topResults', $top_n, PDO::PARAM_INT);
 		$stmt->execute();
-
 		return $stmt->fetchAll();
 	}
 

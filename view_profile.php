@@ -3,6 +3,7 @@
 	include_once('database/country.php');
 	include_once('database/events.php');
 	include_once('database/users.php');
+	include_once('database/session.php');
 	include_once('template/defaults.php');
 	include('template/header.php');
 
@@ -16,13 +17,18 @@
 		if (count($getUser) > 0) {
 			$thisUser = $getUser[0];
 		}
-
-		$thisEvents = users_listAllEvents($_GET['id']);
-		$ownEvents = users_listOwnEvents($_GET['id']);
 	}
 
 	if ($loggedIn) {
 		$isOwner = ($_SESSION['username'] == $thisUser['username']);
+	}
+
+	if ($isOwner) {
+		$thisEvents = users_listAllEvents($_GET['id'], true);
+		$ownEvents = users_listOwnEvents($_GET['id'], true);
+	} else {
+		$thisEvents = users_listAllEvents($_GET['id'], false);
+		$ownEvents = users_listOwnEvents($_GET['id'], false);
 	}
 
 	$numberEvents = count($thisEvents);
@@ -80,9 +86,7 @@ $(document).ready(function() {
 		<h3 class="half-top-space">Events attended (<?=$numberEvents?>)</h3>
 		<div class="bottom-space">
 		<?if($numberEvents>0){
-		foreach($thisEvents as $currentEvent){
-			$isPrivate = ($currentEvent['private'] == 1);
-			if (!$isPrivate || ($isPrivate && $isOwner)) {?>
+		foreach($thisEvents as $currentEvent){?>
 				<div class="half-vertical-space all-100">
 					<img src="holder.js/100x64/auto/ink"/>
 					<b class="quarter-space">
@@ -91,7 +95,6 @@ $(document).ready(function() {
 						</a>
 					</b>
 				</div>
-			<?}?>
 		<?}?>
 		<?}else{?>
 			<p>This user is currently not attending any events :(</p>
@@ -104,23 +107,20 @@ $(document).ready(function() {
         <h3 class="half-top-space">Events created (<?=$numberEventsCreated?>)</h3>
         <div class="half-vertical-space">
         <?if($numberEventsCreated>0){
-        foreach($ownEvents as $currentEvent){
-        	$isPrivate = ($currentEvent['private'] == 1);
-            if (!$isPrivate || ($isPrivate && $isOwner)) {?>
-                <div class="half-vertical-space all-100">
-                <?if($isOwner){?>
-                	<span class="ink-tooltip quarter-horizontal-space" data-tip-where="mousemove" data-tip-text="delete this event">
-                	<a href="delete_event.php"><i class="fa fa-trash"></i></a>
-                	</span>
-                <?}?>
-	                <img src="holder.js/100x64/auto/ink"/>
-	                <b class="quarter-space">
-	                	<a href="<?=events_viewEvent($currentEvent)?>">
-	                	<?=events_getName($currentEvent)?>
-	                	</a>
-	                </b>
-	            </div>
+        foreach($ownEvents as $currentEvent){?>
+            <div class="half-vertical-space all-100">
+            <?if($isOwner){?>
+            	<span class="ink-tooltip quarter-horizontal-space" data-tip-where="mousemove" data-tip-text="delete this event">
+            	<a href="delete_event.php"><i class="fa fa-trash"></i></a>
+            	</span>
             <?}?>
+                <img src="holder.js/100x64/auto/ink"/>
+                <b class="quarter-space">
+                	<a href="<?=events_viewEvent($currentEvent)?>">
+                	<?=events_getName($currentEvent)?>
+                	</a>
+                </b>
+            </div>
         <?}?>
         <?}else{?>
             <p>This user has not created any events :(</p>
@@ -128,11 +128,9 @@ $(document).ready(function() {
         </div>
         <!-- END USER EVENTS -->
 
-
 		</div>
 	</div>
 </div>
-
 <?
 	include('template/footer.php');
 ?>

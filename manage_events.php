@@ -1,18 +1,17 @@
 <?
     include_once('database/connection.php');
     include_once('database/events.php');
+    include_once('database/session.php');
     include_once('database/users.php');
     include('template/header.php');
-	
-    $thisUser = 0;
+
 	$eventParticipants = events_countParticipants();
 	$eventInvited = events_countInvites();
 
 	if ($loggedIn) {
-		$thisUser = $_SESSION['userid'];
 		$upcomingEvents = users_listFutureEvents($thisUser, $currentDate);
 		$numberUpcomingEvents = count($upcomingEvents);
-		$myEvents = users_listOwnEvents($thisUser);
+		$myEvents = users_listOwnEvents($thisUser, true);
 		$numberOwnEvents = count($myEvents);
 	}
 ?>

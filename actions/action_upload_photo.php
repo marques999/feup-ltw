@@ -1,5 +1,5 @@
 <?php
-	$uploadDirectory = './userdata/original/';
+	$uploadDirectory = '../userdata/original/';
 
 	if (isset($_POST['source'])) {
 		$imageSource = $_POST['source'];
@@ -7,13 +7,14 @@
 	else {
 		$imageSource = 'user';
 	}
-
+	echo $imageSource.'<br>';
 	$baseFilename = basename($_FILES['userfile']['name']);
 	$outputFilename = $imageSource . '_' . $baseFilename;
 	$uploadFile = $uploadDirectory . $outputFilename;
-	$smallFile = "./userdata/small/$outputFilename";
-	$mediumFile = "./userdata/medium/$outputFilename";
-
+	$smallFile = "../userdata/small/$outputFilename";
+	$mediumFile = "../userdata/medium/$outputFilename";
+	echo $outputFilename.'<br>';
+	echo $uploadFile.'<br>';
 	if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
 	    exit(0);
 	}
@@ -40,20 +41,24 @@
 	$originalWidth = imagesx($originalImage); // obter comprimento da imagem original
 	$originalHeight = imagesy($originalImage); // obter largura da imagem original
 	$thumbnailSize = 200;
-	$mediumSize = 400;
+	$mediumSize = 500;
 
 	////////////////////////////////////////////////////////////
 	// MEDIUM $mediumSize * $mediumSize                       //
 	////////////////////////////////////////////////////////////
-	if ($originalHeight > $originalWidth) {
+	if ($originalHeight > $originalWidth && $originalHeight > $mediumSize) {
 		/* Portrait */
+		$newHeight = $mediumSize;
+		$newWidth = $newHeight * ($originalWidth / $originalHeight);
+	}
+	else if($originalWidth >= $originalHeight && $originalWidth > $mediumSize) {
+		/* Landscape */
 		$newWidth = $mediumSize;
 		$newHeight = $newWidth * ($originalHeight / $originalWidth);
 	}
 	else {
-		/* Landscape */
-		$newHeight = $mediumSize;
-		$newWidth = $newHeight * ($originalWidth / $originalHeight);
+		$newWidth = $originalWidth;
+		$newHeight = $originalHeight;
 	}
 
 	$resizedImage = imagecreatetruecolor($newWidth, $newHeight);

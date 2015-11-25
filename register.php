@@ -1,4 +1,6 @@
 <?
+    include_once('database/connection.php');
+    include_once('database/users.php');
 	include('template/header.php');
 
 	$thisError = 0;
@@ -9,6 +11,10 @@
 ?>
 
 <script>
+
+var wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
+var fileInput = $('#file-input').wrap(wrapper);
+
 $(document).ready(function() {
 	$('#nav_profile').addClass('active');
 	$("#country-list option").remove();
@@ -17,93 +23,85 @@ $(document).ready(function() {
     		$("#country-list").append($("<option></option>").text(item).val(index));
 		});
 	});
+
+	wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
+	fileInput = $('#file-input');
+	fileInput.change(function(){
+    	readURL(this);
+	})
 });
 
-var wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
-var fileInput = $(':file').wrap(wrapper);
-
-fileInput.change(function(){
-    readURL(this);
-})
-
-$('#file').click(function(){
-    fileInput.click();
-}).show();
-
 function readURL(input) {
+	
 	if (input.files && input.files[0]) {
-	    
+	    console.log("here");
 	    var goUpload = true;
 	    var uploadFile = input.files[0];
 	    
 	    if (!(/\.(bmp|gif|jpg|jpeg|png)$/i).test(uploadFile.name)) {
-	        $('#file').effect("shake");
-	        $('#file').text('You must select an image file only');
-	       
+	        fileInput.effect("shake");
+	        fileInput.text('You must select an image file only');
+	       	    console.log("here2");
 	        setTimeout(function() {
-	        	$('#file').text('Choose an avatar...');
+	        	fileInput.text('Choose an avatar...');
 	     	} ,5000);
 	        
 	        return false;
 	    }
-	   
+	   	    console.log("here3");
 	    if (uploadFile.size > 2000000) { // 2mb
-	        $('#file').text('Please upload a smaller image, max size is 2 MB');
+	       fileInput.text('Please upload a smaller image, max size is 2 MB');
 	        
 	        setTimeout(function() {
-	        	$('#file').text('Choose an avatar...');
+	        	fileInput.text('Choose an avatar...');
 	        }, 5000);
 	        
 	        return false;
 	    }
 
-        $('#file').text("Uploading "+uploadFile.name);
+        fileInput.text("Uploading "+uploadFile.name);
 
         var reader = new FileReader();
         
         reader.onload = function (e) {
-            
-            $('#blah').attr('src', e.target.result);
+
+            $('img#blah').attr('src', e.target.result);
 
             var width = $('#blah').width(); // Current image width
             var height = $('#blah').height(); // Current image height
 
             if (width > 200 || height > 200) {
                 
+                var newHeight = 120 * (height / width);
+                var newWidth = 120 * (width / height);
+               
                 if (width > height) {
-                    var ratio = width / height; // get ratio for scaling image
-                    var newWidth = 120 * ratio;
-                    var margin = '-' + (newWidth - 120) /2 + 'px';
-                    $('img#blah').css("width", newWidth + 'px'); // Set new width
-                    $('img#blah').css("height", '120px'); // Scale height based on ratio
-                    $('#blah').css("margin-left", margin);
-                }
-                
-                if (height > width) {
-                    var ratio = height / width; // get ratio for scaling image
-                    var newHeight = 120 * ratio;
-                    var margin = '-' + (newHeight - 120) /2 + 'px';
-                    $('img#blah').css("height", newHeight + 'px'); // Set new width
-                    $('img#blah').css("width", '120px'); // Scale height based on ratio
-                    $('#blah').css("margin-top", margin);
+                    $('img#blah').css("width", newWidth + 'px'); // set new width
+                    $('img#blah').css("height", '120px'); // scale height based on ratio
+
+                }             
+                else if (height > width) {
+
+                    $('img#blah').css("height", newHeight + 'px'); // set new width
+                    $('img#blah').css("width", '120px'); // scale height based on ratio
+
                 }
 
-                $('#file').text(uploadFile.name);
+                fileInput.text(uploadFile.name);
             }
             else {
-                $('#file').text("Minimum file size: 120x120px");
+                fileInput.text("Minimum file size: 120x120px");
                 
                 setTimeout(function() {
-                	$('#file').text('Choose file');
+                	fileInput.text('Choose file');
                 }, s5000);
             }
+
         }
 
         reader.readAsDataURL(uploadFile);
 	}
 }
-
-
 </script>
 
 <div class="ink-grid all-80 medium-90 small-100 tiny-100">
@@ -165,7 +163,7 @@ function readURL(input) {
 				<label for="file-input" class="all-25 align-right">Avatar:</label>
 				<div class="control all-70">
 					<div class="input-file">
-						<input type="file" name="" id="file-input">
+						<input type="file" name="file" id="file-input">
 					</div>
 				</div>
 			</div>
@@ -180,8 +178,8 @@ function readURL(input) {
 			</div>
 		</fieldset>
 	</form>
-	<div class="all-25 align-center small-100 tiny-100 vertical-space">
-		<img src="holder.js/200x200/auto/ink" alt="">
+	<div id="blah" class="all-25 align-center small-100 tiny-100 vertical-space">
+		<img id="blah" src="holder.js/200x200/auto/ink" alt="">
 		<div class="ink-alert basic">
 		 <p><b>Warning:</b> Avatar size must not exceed 50000 bytes!</p>
 		</div>

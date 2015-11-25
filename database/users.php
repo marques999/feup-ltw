@@ -1,4 +1,5 @@
 <?php
+
     $stmt = $db->prepare('SELECT idUser, username FROM Users');
     $stmt->execute();
     $allUsers = $stmt->fetchAll();
@@ -67,13 +68,46 @@
         return $stmt->fetch();
     }
 
-    function users_listAllEvents($user_id) {
+    function users_listAllEvents($user_id, $private) {
+
         global $db;
-        $stmt = $db->prepare('SELECT Events.* FROM UserEvents JOIN Users, Events 
-                                ON UserEvents.idUser = :idUser
-                                AND Events.idEvent = UserEvents.idEvent
-                                AND Users.idUser = UserEvents.idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+
+        if ($private) {
+            $stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events 
+                ON UserEvents.idUser = :idOwner
+                AND Events.idEvent = UserEvents.idEvent
+                AND Users.idUser = UserEvents.idUser');
+        }
+        else {
+            $stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events 
+                ON UserEvents.idUser = :idOwner
+                AND Events.idEvent = UserEvents.idEvent
+                AND Users.idUser = UserEvents.idUser
+                AND (Events.private = 0
+                OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
+            $stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
+        }
+
+        $stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    function users_listOwnEvents($user_id, $private) {    
+        global $db;
+
+        if ($private) {
+            $stmt = $db->prepare('SELECT DISTINCT * FROM Events WHERE idUser = :idOwner');
+        }
+        else {
+             $stmt = $db->prepare('SELECT DISTINCT Events.* FROM Events 
+                JOIN UserEvents ON Events.idUser = :idOwner
+                AND UserEvents.idEvent = Events.idEvent
+                AND (Events.private = 0 OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
+             $stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
+        }
+    
+        $stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -108,10 +142,10 @@
     function users_listFutureEvents($user_id, $current_date) {
         global $db;
         $stmt = $db->prepare('SELECT Events.* FROM UserEvents JOIN Users, Events 
-                                ON UserEvents.idUser = :idUser
-                                AND Events.idEvent = UserEvents.idEvent
-                                AND Users.idUser = UserEvents.idUser
-                                WHERE Events.date > :currentDate');
+                ON UserEvents.idUser = :idUser
+                AND Events.idEvent = UserEvents.idEvent
+                AND Users.idUser = UserEvents.idUser
+                WHERE Events.date > :currentDate');
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->bindParam(':currentDate', $current_date, PDO::PARAM_INT);
         $stmt->execute();
@@ -121,9 +155,9 @@
     function users_countInvites($user_id) {
         global $db;
         $stmt = $db->prepare('SELECT COUNT(*) AS count FROM Invites 
-                                INNER JOIN Users 
-                                ON Invites.idUser = :idUser
-                                AND Users.idUser = Invites.idUser');
+                INNER JOIN Users 
+                ON Invites.idUser = :idUser
+                AND Users.idUser = Invites.idUser');
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -138,29 +172,29 @@
     function users_listInvites($user_id) {
         global $db;
         $stmt = $db->prepare('SELECT Events.*, Invites.idSender FROM Invites
-                                INNER JOIN Users, Events
-                                ON Events.idEvent = Invites.idEvent
-                                AND Invites.idUser = :idUser
-                                AND Users.idUser = Invites.idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-    
-    function users_listOwnEvents($user_id) {    
-        global $db;
-        $stmt = $db->prepare('SELECT * FROM Events WHERE idUser = :idUser');
+                INNER JOIN Users, Events
+                ON Events.idEvent = Invites.idEvent
+                AND Invites.idUser = :idUser
+                AND Users.idUser = Invites.idUser');
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    function users_userExists($username) {   
+    function users_usernameExists($username) {   
         global $db;
         $stmt = $db->prepare('SELECT username FROM Users WHERE username = :username');
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetchAll() != false;
+    }
+
+    function users_idExists($user_id) {
+        global $db;
+        $stmt = $db->prepare('SELECT username FROM Users WHERE idUser = :idUser');
+        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll() != false;     
     }
 
     function users_emailExists($email) {

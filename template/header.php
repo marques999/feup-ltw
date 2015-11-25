@@ -1,24 +1,13 @@
 <?
-	include('template/defaults.php');
-
 	session_start();
-    
-    $loggedIn = (isset($_SESSION['username']) == true);
-    $currentDate = time();
-    $thisUser = $defaultUser;
-
-    if ($loggedIn) {
-        $thisUser = $_SESSION['userid'];
-        $numberInvites = users_countInvites($thisUser);
-   	}
+	include('database/session.php');
+	include('template/defaults.php');
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Forms</title>
-<meta name="author" content="ink, cookbook, recipes">
+<title>Cascading Events</title>
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -32,6 +21,25 @@
 Modernizr.load({
 	test:Modernizr.flexbox,
 	nope:'../css/ink-legacy.min.css'
+});
+$(function() {
+	var header_container = $('#header-container>h1');
+	var header_navigation = $('nav#header-menu');
+	var header_height = header_container.outerHeight();
+	var document_window = $(window);
+
+	document_window.scroll(function(){
+	    if (document_window.scrollTop() > header_height) {
+	       header_navigation.addClass('fixed-header');
+	    }
+	    else {
+	       header_navigation.removeClass('fixed-header');
+	    }
+	});
+
+	document_window.resize(function() {
+		header_height = header_container.outerHeight() + 1;
+	});
 });
 </script>
 <script type="text/javascript" src="js/holder.min.js"></script>
@@ -60,8 +68,12 @@ Modernizr.load({
 		<?if(isset($_SESSION['username'])){?>
 			<a><i class="fa fa-user"></i> <?=$_SESSION['username']?></a>
 			<ul class="submenu">
-				<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>
-				<li><a href="manage_invites.php">My Invites (0)</a></li>
+				<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>			
+				<?if($numberInvites>0){?>
+					<li><strong><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></strong></li>
+				<?}else{?>
+					<li><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></li>
+				<?}?>
 				<li><a href="actions/action_logout.php">Logout</a></li>
 			</ul>
 		<?}else{?>

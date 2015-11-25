@@ -6,69 +6,69 @@
 
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script>
-	var currentTime = new Date(); 
-	var gmaps_map = null;
-	var geocoder = null;
-	var marker = null;
-
-	google.maps.event.addDomListener(window, 'load', function() {
-		geocoder = new google.maps.Geocoder();
-		gmaps_map = new google.maps.Map(document.getElementById('location-map'), 
+$(function() 
+{     	
+	currentTime = new Date(); 
+	$('input#hours').val(currentTime.getHours());	
+	$('input#minutes').val(currentTime.getMinutes());		
+	$.getJSON("json/events.json", function(data)
+	{ 	
+		$.each(data, function(index, item)
 		{
-			zoom: 15,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-    	});
-    	var defaultMarker = new google.maps.Marker(
-    	{
-    		map: gmaps_map, 
-    		position: {'lat': 44.5403, 'lng': -78.5463}
-    	});
-		if (navigator.geolocation) 
-		{
-			navigator.geolocation.getCurrentPosition(function(position) 
-			{
-				marker = new google.maps.Marker(
-				{
-					map: gmaps_map,
-					position: {'lat':position.coords.latitude,'lng':position.coords.longitude}
-				});
-				$("input#location").val(marker.getPosition().toString());
-				gmaps_map.setCenter(marker.getPosition());
-			}, function() 
-			{
-				gmaps_map.setCenter(defaultMarker.getPosition());
-			});
-		}
-	});
-
-	$(document).ready(function() 
-	{     		
-		$('input#hours').val(currentTime.getHours());	
-		$('input#minutes').val(currentTime.getMinutes());		
-		$('input#location').keydown(function(event) 
-		{
-			if (event.keyCode == 13 || event.which == 13) 
-			{
-				geocoder.geocode({'address':$("input#location").val()}, function(results, status)
-				{
-					if (status == google.maps.GeocoderStatus.OK)
-					{
-						marker = new google.maps.Marker({map:gmaps_map,position:results[0].geometry.location});
-						gmaps_map.setCenter(marker.getPosition());
-						$("input#location").val(results[0].geometry.location);
-					}
-				});
-				event.preventDefault();
-			}
-		});	
-		$.getJSON("json/events.json", function(data)
-		{ 	
-			$.each(data, function(index, item)
-			{
-				$("select#type").append($("<option></option>").text(item).val(item));
-			});
+			$("select#type").append($("<option></option>").text(item).val(item));
 		});
 	});
+});
+
+google.maps.event.addDomListener(window, 'load', function() {
+
+	var defaultMarker = new google.maps.Marker({
+		map: gmaps_map, 
+		position: {'lat': 44.5403, 'lng': -78.5463}
+	});
+
+	var gmaps_map = new google.maps.Map(document.getElementById('location-map'), {
+		zoom: 15,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	});
+
+	var geocoder = new google.maps.Geocoder();
+	var locationString = $("input#location");
+	var marker = null;
+
+	if (navigator.geolocation) 
+	{
+		navigator.geolocation.getCurrentPosition(function(position) 
+		{
+			marker = new google.maps.Marker(
+			{
+				map: gmaps_map,
+				position: {'lat':position.coords.latitude,'lng':position.coords.longitude}
+			});
+			locationString.val(marker.getPosition().toString());
+			gmaps_map.setCenter(marker.getPosition());
+		}, function() 
+		{
+			gmaps_map.setCenter(defaultMarker.getPosition());
+		});
+	}
+	$('input#location').keydown(function(event) 
+	{
+		if (event.keyCode == 13 || event.which == 13) 
+		{
+			geocoder.geocode({'address':locationString.val()}, function(results, status)
+			{
+				if (status == google.maps.GeocoderStatus.OK)
+				{
+					marker = new google.maps.Marker({map:gmaps_map,position:results[0].geometry.location});
+					gmaps_map.setCenter(marker.getPosition());
+					locationString.val(results[0].geometry.location);
+				}
+			});
+			event.preventDefault();
+		}
+	});	
+});
 </script>
 
 <div class="ink-grid all-100">
