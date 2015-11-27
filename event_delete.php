@@ -5,11 +5,13 @@
     include_once('database/users.php');
     include('template/header.php');
 
-    $thisEvent = 0;
+    $thisEvent = $defaultEvent;
+    $eventId = 0;
     $ownEvent = false;
 
     if (isset($_GET['id']) && $loggedIn) {
-    	$thisEvent = events_listById($_GET['id']);
+    	$eventId = intval($_GET['id']);
+    	$thisEvent = events_listById($eventId);
 
     	if (count($thisEvent > 0)) {
     		$thisEvent = $thisEvent[0];

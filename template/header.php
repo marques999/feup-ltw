@@ -1,7 +1,7 @@
 <?
 	session_start();
+	include_once('template/defaults.php');
 	include('database/session.php');
-	include('template/defaults.php');
 ?>
 <!DOCTYPE html>
 <html>

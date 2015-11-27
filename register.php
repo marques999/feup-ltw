@@ -4,7 +4,7 @@
 	include('template/header.php');
 
 	$thisError = 0;
-
+	$nextId = users_getNextId() + 1;
 	if (isset($_GET['error'])) {
 		$thisError = $_GET['error'];
 	}
@@ -26,9 +26,27 @@ $(document).ready(function() {
 
 	wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
 	fileInput = $('#file-input');
-	fileInput.change(function(){
-    	readURL(this);
-	})
+/*	fileInput.change(function(){
+    	$.ajax({
+		type: 'post',
+		url: 'actions/action_upload_photo.php',
+		data: {
+				'source': 'user',
+				'idUser': <?=$nextId?>
+		},
+		contentType: false,
+		cache: false,
+		processData: false,
+		success: function(destination) {
+			if (destination == window.location.pathname) {
+				window.location.reload();
+			}
+			else {
+				window.location = destination;
+			}
+		}
+		});
+	})*/
 });
 
 function readURL(input) {
@@ -108,7 +126,7 @@ function readURL(input) {
 <div class="column-group vertical-space">
 	<div class="column all-20 large-10 medium-10 small-0 tiny-0">
 	</div>
-	<form action="actions/action_create_user.php" method="POST" class="ink-form ink-formvalidator">
+	<form action="action_create_user.php" method="POST" enctype="multipart/form-data" class="ink-form ink-formvalidator">
 		<fieldset>
 			<legend class="align-center">Register Account</legend>
 			<div class="control-group required column-group half-gutters">
@@ -161,9 +179,10 @@ function readURL(input) {
 			</div>
 			<div class="control-group column-group half-gutters">
 				<label for="file-input" class="all-25 align-right">Avatar:</label>
+				<input type="hidden" name="idUser" value="<?=$nextId?>">
 				<div class="control all-70">
 					<div class="input-file">
-						<input type="file" name="file" id="file-input">
+						<input type="file" name="userfile" id="file-input">
 					</div>
 				</div>
 			</div>

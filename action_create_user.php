@@ -1,34 +1,79 @@
 <?
-	$imageSource = 'user';
-	$thisUser = 4;
-	$uploadDirectory = '../img/avatars/';
+	include_once('database/connection.php');
+	include_once('database/country.php');
+	include_once('database/salt.php');
+	include_once('database/users.php');
+	include('template/header.php');
+?>
 
-	if (isset($_POST['source']) && isset($_POST['idUser'])) {
-		$imageSource = $_POST['source'];
-		$thisUser = $_POST['idUser']);
-	}
+<script>
+	$(document).ready(function() {
+		$('#nav_profile').addClass('active');
+	});
+</script>
+
+<?if (!isset($_POST['username']) || !isset($_POST['password'])) {
+	exit(0);
+}
+
+$userExists = users_usernameExists($_POST['username']);
+$emailExists = users_emailExists($_POST['email']);
+
+function logError($message) {?>
+<div class="column-group half-vertical-space">
+	<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
+	<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
+		<h4>Database Error</h4>
+		<p><?=$message?></p>
+		<p>Please click <a href="register.php">here</a> to continue</p>
+	</div>
+</div>
+<?exit(0);
+}
+?>
+
+<?if($userExists) logError('User account creation failed! (username already taken)');?>
+<?if($emailExists) logError('User account creation failed! (another user with the same e-mail address exists)');?>
+
+<?$uploadDirectory = 'img/avatars/';
+
+	if (isset($_POST['idUser'])) {
+		$thisUser = $_POST['idUser'];
+	} else {
+		?><div class="column-group half-vertical-space">
+		<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
+		<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
+			<h4>Database Error</h4>
+			<p>User account creation failed! (invalid avatar uploaded)</p>
+			<p>Please click <a href="register.php">here</a> to continue</p>
+		</div>
+	</div>
+	<?}
 
 	$baseFilename = basename($_FILES['userfile']['name']);
 	$fileExtension = strtolower(substr($baseFilename, strrpos($baseFilename, '.') + 1));
+	$outputFilename = "{$thisUser}_original.{$fileExtension}";
+	$uploadFile = $uploadDirectory . $outputFilename;
+	$smallFile = "img/avatars/{$thisUser}_small.{$fileExtension}";
+	$mediumFile = "img/avatars/{$thisUser}.{$fileExtension}";
 
 	echo $baseFilename.'<br>';
 	echo $fileExtension.'<br>';
-
-	if ($imageSource == 'user') {
-		$outputFilename = "{$thisUser}_original.{$fileExtension}";
-	}
-	
-	$uploadFile = $uploadDirectory . $outputFilename;
-	$smallFile = "../img/avatars/{$thisUser}_small.{$fileExtension}";
-	$mediumFile = "../img/avatars/{$thisUser}.{$fileExtension}";
-
 	echo $uploadFile.'<br>';
 	echo $outputFilename.'<br>';
 	echo $smallFile.'<br>';
 	echo $mediumFile.'<br>';
 
 	if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
-	    exit(0);
+	    	?><div class="column-group half-vertical-space">
+		<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
+		<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
+			<h4>Database Error</h4>
+			<p>User account creation failed! (user has choosen an invalid image format)</p>
+			<p>Please click <a href="register.php">here</a> to continue</p>
+		</div>
+	</div>
+	  <?  exit(0);
 	}
 
 	$originalImage = null;
@@ -49,6 +94,8 @@
 		exit(0);
 	}
 
+
+
 	$originalWidth = imagesx($originalImage); // obter comprimento da imagem original
 	$originalHeight = imagesy($originalImage); // obter largura da imagem original
 	$thumbnailSize = 64;
@@ -57,6 +104,7 @@
 	////////////////////////////////////////////////////////////
 	// MEDIUM $mediumSize * $mediumSize                       //
 	////////////////////////////////////////////////////////////
+
 	if ($originalHeight > $originalWidth && $originalHeight > $mediumSize) {
 		/* Portrait */
 		$newHeight = $mediumSize;
@@ -98,6 +146,7 @@
 	////////////////////////////////////////////////////////////
 	// THUMBNAIL $thumbnailSize * $thumbnailSize			  //
 	////////////////////////////////////////////////////////////
+
 	$thumbnailImage = imagecreatetruecolor($thumbnailSize, $thumbnailSize);
 
 	// preserve transparency from original image (PNG/GIF only)
@@ -138,4 +187,32 @@
 	imagedestroy($originalImage);
 	imagedestroy($resizedImage);
 	imagedestroy($thumbnailImage);
+
+
+	$newPassword = create_hash($_POST['password']);
+	$fullName = "{$_POST['first-name']} {$_POST['last-name']}";
+	$stmt = $db->prepare('INSERT INTO Users VALUES(NULL, :username, :password, :name, :email, :location, :country)');
+	$stmt->bindParam(':username', $_POST['username'], PDO::PARAM_STR);
+	$stmt->bindParam(':password', $newPassword, PDO::PARAM_STR);
+	$stmt->bindParam(':name', $fullName, PDO::PARAM_STR);
+	$stmt->bindParam(':email', $_POST['email'], PDO::PARAM_STR);
+	$stmt->bindParam(':location', $_POST['location'], PDO::PARAM_STR);
+	$stmt->bindParam(':country', $_POST['country'], PDO::PARAM_STR);?>
+	<div class="ink-grid all-80 medium-90 small-90">
+	<?if ($stmt->execute() == true){?>
+		<div class="column-group half-vertical-space">
+			<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
+			<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block success" role="alert">
+				<h4>Information</h4>
+				<p>User account created successfully!</p>
+				<p>You will be taken shortly to the login page...</p>
+			</div>
+		</div>
+		<?
+	}else{
+		include('message_database.php');
+	}?>
+	</div>
+<?}
+	include('template/footer.php');
 ?>

@@ -1,9 +1,12 @@
-<?php
-
+<?
     $stmt = $db->prepare('SELECT idUser, username FROM Users');
     $stmt->execute();
-    $allUsers = $stmt->fetchAll();
+    $allUsers = array();
 
+    while(($result = $stmt->fetch()) != null) {
+        $allUsers[$result['idUser']] = $result;
+    }
+    
     function users_listById($user_id) {     
         global $db;
         $stmt = $db->prepare('SELECT * FROM Users WHERE idUser = :idUser');
@@ -12,12 +15,34 @@
         return $stmt->fetchAll();
     }
 
-    function users_formatLocation($user_data) {
-        $countryString = getCountry($user_data['country']);
-        return "{$user_data['location']}, $countryString";
+    function users_formatLocation($userData) {
+        
+        if (!is_array($userData) || !isset($userData['country']) || !isset($userData['location'])) {
+            $userData = $defaultUser;
+        }
+
+        $countryString = getCountry($userData['country']);
+        return "{$userData['location']}, $countryString";
+    }
+
+    function users_getNextId() {
+        global $db;
+        $stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Users'");
+        $stmt->execute();
+        $result = $stmt->fetch();
+        
+        if ($result != false && is_array($result)) {
+            return $result['seq'];
+        }
+
+        return -1;
     }
 
     function users_getCountryFlag($userData) {
+
+        if (!is_array($userData) || !isset($userData['country'])) {
+            $userData = $defaultUser;
+        }
 
         $country = $userData['country'];
         
@@ -30,27 +55,39 @@
 
     function users_getAvatar($userData) {
 
+        if (!is_array($userData) || !isset($userData['idUser'])) {
+            $userData = $defaultUser;
+        }
+
         $user_id = intval($userData['idUser']);
         
         if (!intval($user_id)) {
             $user_id = 0;
         }
 
-        return "img/avatars/$user_id.png";
+        return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
     }
 
     function users_getSmallAvatar($userData) {
        
-       $user_id = intval($userData['idUser']);
+        if (!is_array($userData) || !isset($userData['idUser'])) {
+            $userData = $defaultUser;
+        }
+
+        $user_id = intval($userData['idUser']);
 
         if (!intval($user_id)) {
             $user_id = 0;
         }
 
-        return "img/avatars/{$user_id}_small.png";
+        return glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
     }
 
     function users_viewProfile($userData) {
+
+        if (!is_array($userData) || !isset($userData['idUser'])) {
+            $userData = $defaultUser;
+        }
 
         $user_id = intval($userData['idUser']);
 
@@ -65,7 +102,13 @@
         global $db;
         $stmt = $db->prepare('SELECT COUNT(*) AS count FROM Users');
         $stmt->execute();
-        return $stmt->fetch();
+        $result = $stmt->fetchAll();
+
+        if ($result != false && is_array($result) && count($result) > 0) {
+             return $result[0]['count'];
+        }
+
+        return 0;
     }
 
     function users_listAllEvents($user_id, $private) {
@@ -166,16 +209,16 @@
              return $result[0]['count'];
         }
        
-       return null;
+       return 0;
     }
 
     function users_listInvites($user_id) {
         global $db;
         $stmt = $db->prepare('SELECT Events.*, Invites.idSender FROM Invites
-                INNER JOIN Users, Events
-                ON Events.idEvent = Invites.idEvent
-                AND Invites.idUser = :idUser
-                AND Users.idUser = Invites.idUser');
+            INNER JOIN Users, Events
+            ON Events.idEvent = Invites.idEvent
+            AND Invites.idUser = :idUser
+            AND Users.idUser = Invites.idUser');
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -186,7 +229,8 @@
         $stmt = $db->prepare('SELECT username FROM Users WHERE username = :username');
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt->fetchAll() != false;
+        $result = $stmt->fetchAll();    
+        return $result != false && is_array($result) && count($result) > 0;
     }
 
     function users_idExists($user_id) {
@@ -194,7 +238,8 @@
         $stmt = $db->prepare('SELECT username FROM Users WHERE idUser = :idUser');
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt->fetchAll() != false;     
+        $result = $stmt->fetchAll();    
+        return $result != false && is_array($result) && count($result) > 0;
     }
 
     function users_emailExists($email) {
@@ -202,7 +247,8 @@
         $stmt = $db->prepare('SELECT email FROM Users WHERE email = :email');
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt->fetchAll() != false;
+        $result = $stmt->fetchAll();
+        return $result != false && is_array($result) && count($result) > 0;
     }
 
     function validateLogin($username, $password) {
@@ -212,14 +258,13 @@
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
         $queryResult = $stmt->fetchAll();
-        $numberResults = count($queryResult);
 
-        if ($queryResult != false && $numberResults == 1) {
+        if ($queryResult != false && count($queryResult) > 0) {
             $correctHash = $queryResult[0]['password'];
             $validateResult = validate_password($password, $correctHash); 
             return $queryResult[0]['idUser'];
         }
 
-        return $numberResults;
+        return 0;
     }
 ?>

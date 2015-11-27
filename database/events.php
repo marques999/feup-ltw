@@ -1,5 +1,4 @@
-<?php
-
+<?
 	function events_listPublic() {		
 		global $db;
 		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 0');
@@ -16,6 +15,10 @@
 
 	function events_viewEvent($eventData) {
 
+        if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+            $userData = $defaultUser;
+        }
+
         $event_id = intval($eventData['idEvent']);
 
         if (!intval($event_id)) {
@@ -27,16 +30,19 @@
 
 	function events_getName($eventData) {
 
-		$event_id = intval($eventData['idEvent']);
-        $isPrivate = intval($eventData['private']);
+ 		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+            $userData = $defaultUser;
+        }
+
+		$event_id = intval($eventData['idEvent']);   
 
         if (!intval($event_id)) {
             $event_id = 0;
         }
 
-       	if ($isPrivate) {
-       		return "<i class=\"fa fa-lock\"></i> {$eventData['name']}";
-       	}
+        if (isset($eventData['private']) && intval($eventData['private']) == 1) {
+        	return "<i class=\"fa fa-lock\"></i> {$eventData['name']}";
+        }
 
         return $eventData['name'];
 	}

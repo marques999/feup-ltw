@@ -2,7 +2,6 @@
 	include_once('database/connection.php');
 	include_once('database/comments.php');
 	include_once('database/events.php');
-	include_once('database/session.php');
 	include_once('database/users.php');
 	include_once('template/defaults.php');
 	include('template/header.php');
@@ -17,7 +16,7 @@
 
 	if (isset($_GET['id'])) {
 
-		$eventId = $_GET['id'];
+		$eventId = intval($_GET['id']);
 		$getEvent = events_listById($eventId);
 
 		if (count($getEvent) > 0) {
@@ -322,7 +321,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 			</b></div>
 
 			<?if ($i == count($thisParticipants) - 1){?>
-				echo '</div>';
+				</div>
 			<?}?>
 		<?}?>
 		<?}else{?>
@@ -338,11 +337,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 		<div class="column-group vertical-space">
 		<?if ($numberComments>0) {
 			foreach($thisComments as $currentComment) {
-				$commentAuthor = $defaultUser;
-				$authorIndex = $currentComment['idUser'] - 1;
-				if (isset($currentComment[$authorIndex])){
-					$commentAuthor = $allUsers[$authorIndex];
-				}?>
+				$commentAuthor = $allUsers[$currentComment['idUser']];?>
 				<div class="column all-100">
 					<img class="push-left half-right-space" src="<?=users_getSmallAvatar($currentComment)?>"/>
 					<a href="<?=users_viewProfile($commentAuthor)?>"><?=$commentAuthor['username']?></a>
@@ -360,7 +355,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 	<!-- BEGIN DYNAMIC SECTION -->
 	<div id="write-comment">
-	<form action="action_comment.php" method="POST" class="ink-form ink-formvalidation all-100">
+	<form action="actions/action_comment.php" method="POST" class="ink-form ink-formvalidation all-100">
 		<input type="hidden" name="idUser" value="<?=$_SESSION['userid']?>"></input>
 		<input type="hidden" name="idEvent" value="<?=$eventId?>"></input>
 		<div class="control-group column-group half-gutters">

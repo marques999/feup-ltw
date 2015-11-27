@@ -9,10 +9,12 @@
 
 	$thisUser = $defaultUser;
 	$isOwner = false;
+	$userId = 0;
 
 	if (isset($_GET['id'])) {
 
-		$getUser = users_listById($_GET['id']);
+		$userId = intval($_GET['id']);
+		$getUser = users_listById($userId);
 
 		if (count($getUser) > 0) {
 			$thisUser = $getUser[0];
@@ -24,11 +26,11 @@
 	}
 
 	if ($isOwner) {
-		$thisEvents = users_listAllEvents($_GET['id'], true);
-		$ownEvents = users_listOwnEvents($_GET['id'], true);
+		$thisEvents = users_listAllEvents($userId, true);
+		$ownEvents = users_listOwnEvents($userId, true);
 	} else {
-		$thisEvents = users_listAllEvents($_GET['id'], false);
-		$ownEvents = users_listOwnEvents($_GET['id'], false);
+		$thisEvents = users_listAllEvents($userId, false);
+		$ownEvents = users_listOwnEvents($userId, false);
 	}
 
 	$numberEvents = count($thisEvents);
