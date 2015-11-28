@@ -1,20 +1,18 @@
 <?
 	include_once('database/connection.php');
-	include_once('database/events.php');
+	include_once('database/session.php');
 	include_once('database/users.php');
 	include('template/header.php');
 
-	$thisEvent = $defaultEvent;
-	$eventId = 0;
-	$ownEvent = false;
+	$userId = 0;
+	$sameUser = false;
 
 	if (isset($_GET['id']) && $loggedIn) {
-		$eventId = intval($_GET['id']);
-		$thisEvent = events_listById($eventId);
+		$userId = intval($_GET['id']);
+		$userExists = users_idExists($userId);
 
-		if (count($thisEvent > 0)) {
-			$thisEvent = $thisEvent[0];
-			$ownEvent = $thisUser == $thisEvent['idUser'];
+		if ($userExists) {
+			$sameUser = ($userId == $thisUser);
 		}
 	}
 ?>
@@ -27,15 +25,15 @@
 
 <div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
 <?if($loggedIn){?>
-	<?if($ownEvent){?>
+	<?if($sameUser){?>
 	<div class="column all-100 ink-alert block info">
-		<h4>Delete Event</h4>
-		<p>Are you sure you want to delete <b><?=$thisEvent['name']?></b>?</p>
-		<form action="actions/action_delete_event.php" method="post" class="ink-form">
+		<h4>Delete Account</h4>
+		<p>Are you sure you want to delete your <strong>user account</strong>?</p>
+		<p>You will be signed out automatically...</p>
+		<form action="actions/action_delete_event.php" class="ink-form">
 		<div class="control-group column-group half-gutters">
 			<div class="control all-100 align-center">
 				<span class="align-center">
-					<input type="hidden" name="idEvent" value="<?=$eventId?>"/>
 					<input type="submit" name="result" value="Yes" class="ink-button all-20"/>
 					<input type="reset" name="result" value="No" class="ink-button all-20"/>
 				</span>
@@ -47,7 +45,7 @@
 	<div class="column ink-alert block error">
 		<h4>Forbidden</h4>
 		<p>You don't have permission to access this page!</p>
-		<p>Are you trying to delete events from other users?</p>
+		<p>Are you trying to delete accounts from other users?</p>
 	</div>
 	<?}?>
 <?}else{?>

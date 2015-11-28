@@ -1,15 +1,12 @@
 <?
     include_once('database/connection.php');
     include_once('database/events.php');
-    include_once('database/session.php');
     include_once('database/users.php');
     include('template/header.php');
 	
-	$eventParticipants = events_countParticipants();
-	$eventInvited = events_countInvites();
-
 	if ($loggedIn) {
 		$myEvents = users_listInvites($thisUser);
+		$eventParticipants = events_countParticipants();
 		$numberOwnEvents = count($myEvents);
 	}
 ?>
@@ -17,8 +14,14 @@
 <script>
 $(function() {
 	$('#nav_events').addClass('active');
+});
+</script>
+
+<?if($loggedIn){?>
+<script>
+$(function() {
 	$('button.accept').each(function() {
-    	this.click(function(evt) {		
+    	$(this).click(function(evt) {		
     		$.ajax({
 				type: 'post',
 				url: 'actions/action_invite_accept.php',
@@ -33,7 +36,7 @@ $(function() {
 		});
 	});
 	$('button.reject').each(function() {		
-		this.click(function(evt) {		
+		$(this).click(function(evt) {		
 			$.ajax({
 				type: 'post',
 				url: 'actions/action_invite_reject.php',
@@ -49,9 +52,7 @@ $(function() {
 	});
 });
 </script>
-
 <div class="ink-grid all-80 medium-100 small-100 tiny-100">
-<?if($loggedIn){?>
 <div class="column-group all-100 gutters half-vertical-space">
 <!-- BEGIN INVITES SECTION -->
 	<div class="column all-100">
@@ -106,7 +107,7 @@ $(function() {
 	        </li>
 			<?}?>
 	    <?}else{?>
-			<li class="panel slide all-100">
+			<li class="panel all-100">
 				<span>You have no events :(</span>
 			</li>
 		<?}?>
@@ -114,18 +115,17 @@ $(function() {
 	</div>
 <!-- END INVITES SECTION -->
 </div>
+</div>
 <?}else{?>
-<div class="column-group half-vertical-space">
-	<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
-	<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
+<div class="ink-grid all-50 large-70 medium-80 small-100 tiny-100">
+	<div class="column ink-alert block error">
 		<h4>Forbidden</h4>
 		<p>You don't have permission to access this page!</p>
 		<p>Please <a href="login.php">log in</a> with your account first.</p>
 	</div>
 </div>
 <?}?>
-</div>
-</div>
+
 <?
 	include('template/footer.php');
 ?>

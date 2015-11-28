@@ -5,6 +5,7 @@
 
 	$thisError = 0;
 	$nextId = users_getNextId() + 1;
+	
 	if (isset($_GET['error'])) {
 		$thisError = $_GET['error'];
 	}
@@ -122,11 +123,9 @@ function readURL(input) {
 }
 </script>
 
-<div class="ink-grid all-80 medium-90 small-100 tiny-100">
-<div class="column-group vertical-space">
-	<div class="column all-20 large-10 medium-10 small-0 tiny-0">
-	</div>
-	<form action="action_create_user.php" method="POST" enctype="multipart/form-data" class="ink-form ink-formvalidator">
+<div class="ink-grid all-80">
+<div class="column-group all-100 vertical-space">
+	<form action="action_create_user.php" method="post" enctype="multipart/form-data" class="ink-form ink-formvalidator">
 		<fieldset>
 			<legend class="align-center">Register Account</legend>
 			<div class="control-group required column-group half-gutters">
@@ -205,6 +204,7 @@ function readURL(input) {
 	</div>
 </div>
 </div>
+
 <?
 	include('template/footer.php');
 ?>

@@ -12,29 +12,29 @@
 	});
 </script>
 
-<?if (!isset($_POST['username']) || !isset($_POST['password'])) {
-	exit(0);
+<?
+	if (!isset($_POST['username']) || !isset($_POST['password'])) {
+		exit(0);
+	}
+
+	function logError($message) {?>
+	<div class="column-group half-vertical-space">
+		<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
+		<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
+			<h4>Database Error</h4>
+			<p><?=$message?></p>
+			<p>Please click <a href="register.php">here</a> to continue</p>
+		</div>
+	</div>
+	<?exit(0);
 }
 
 $userExists = users_usernameExists($_POST['username']);
 $emailExists = users_emailExists($_POST['email']);
-
-function logError($message) {?>
-<div class="column-group half-vertical-space">
-	<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
-	<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
-		<h4>Database Error</h4>
-		<p><?=$message?></p>
-		<p>Please click <a href="register.php">here</a> to continue</p>
-	</div>
-</div>
-<?exit(0);
-}
 ?>
 
 <?if($userExists) logError('User account creation failed! (username already taken)');?>
 <?if($emailExists) logError('User account creation failed! (another user with the same e-mail address exists)');?>
-
 <?$uploadDirectory = 'img/avatars/';
 
 	if (isset($_POST['idUser'])) {
@@ -93,8 +93,6 @@ function logError($message) {?>
 	else {
 		exit(0);
 	}
-
-
 
 	$originalWidth = imagesx($originalImage); // obter comprimento da imagem original
 	$originalHeight = imagesy($originalImage); // obter largura da imagem original
@@ -188,31 +186,44 @@ function logError($message) {?>
 	imagedestroy($resizedImage);
 	imagedestroy($thumbnailImage);
 
+	// BEGIN USER INFORMATION
 
 	$newPassword = create_hash($_POST['password']);
 	$fullName = "{$_POST['first-name']} {$_POST['last-name']}";
 	$stmt = $db->prepare('INSERT INTO Users VALUES(NULL, :username, :password, :name, :email, :location, :country)');
+
+	// parameter 'username'
+	$safeUsername = strip_tags_content($_POST['username']);
 	$stmt->bindParam(':username', $_POST['username'], PDO::PARAM_STR);
+
+	// parameter 'password'
 	$stmt->bindParam(':password', $newPassword, PDO::PARAM_STR);
-	$stmt->bindParam(':name', $fullName, PDO::PARAM_STR);
+
+	// parameter 'fullname'
+	$safeName = strip_tags_content($fullName);
+	$stmt->bindParam(':name', $safeName, PDO::PARAM_STR);
+
+	// parameter 'email'
+	$safeEmail = strip_tags_content($_POST['email']);
 	$stmt->bindParam(':email', $_POST['email'], PDO::PARAM_STR);
-	$stmt->bindParam(':location', $_POST['location'], PDO::PARAM_STR);
-	$stmt->bindParam(':country', $_POST['country'], PDO::PARAM_STR);?>
-	<div class="ink-grid all-80 medium-90 small-90">
+
+	// parameter 'location' & 'country'
+	$safeLocation = strip_tags_content($_POST['location']);
+	$stmt->bindParam(':location', $safeLocation, PDO::PARAM_STR);
+	$stmt->bindParam(':country', $_POST['country'], PDO::PARAM_STR);
+
 	<?if ($stmt->execute() == true){?>
-		<div class="column-group half-vertical-space">
-			<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
-			<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block success" role="alert">
-				<h4>Information</h4>
-				<p>User account created successfully!</p>
-				<p>You will be taken shortly to the login page...</p>
-			</div>
+	<div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
+		<div class="column ink-alert block success">
+			<h4>Information</h4>
+			<p>User account created successfully!</p>
+			<p>You will be taken shortly to the login page...</p>
 		</div>
-		<?
-	}else{
-		include('message_database.php');
-	}?>
 	</div>
-<?}
+	<?}
+	else {
+		header("../database_error.php");
+	}
+
 	include('template/footer.php');
 ?>

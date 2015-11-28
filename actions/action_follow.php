@@ -1,6 +1,5 @@
 <?
 	include_once('../database/action.php');
-	include_once('../database/country.php');
 	include_once('../database/users.php');
 
 	if (isset($_POST['idEvent']) && isset($_POST['idUser'])) {
@@ -10,7 +9,6 @@
 		$wasInvited = users_wasInvited($thisParticipant, $thisEvent);
 
 		if (!$isParticipating) {
-
 			$stmt = $db->prepare('INSERT INTO UserEvents VALUES(:idEvent, :idUser)');
 			$stmt->bindParam(':idEvent', $thisEvent, PDO::PARAM_INT);
 			$stmt->bindParam(':idUser', $thisParticipant, PDO::PARAM_INT);

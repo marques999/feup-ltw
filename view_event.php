@@ -3,7 +3,6 @@
 	include_once('database/comments.php');
 	include_once('database/events.php');
 	include_once('database/users.php');
-	include_once('template/defaults.php');
 	include('template/header.php');
 
 	$thisEvent = $defaultEvent;
@@ -54,6 +53,19 @@
 	$numberComments = count($thisComments);
 ?>
 
+<?if($isPrivate && !$isOwner && !($wasInvited || $isParticipating)){?>
+<div class="ink-grid all-50 large-70 medium-80 small-100 tiny-100">
+	<div class="column ink-alert block error">
+		<h4>Private Event</h4>
+		<p>You don't have permissions to access this page!</p>
+		<?if($loggedIn){?>
+			<p>Private events are <strong>invite</strong> only, you must be invited to this event by other users.</p>
+		<?}else{?>
+			<p>Please <a href="login.php">log in</a> with your account first.</p>
+		<?}?>
+	</div>
+</div>
+<?}else{?>
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script>
 $(function() {
@@ -124,22 +136,7 @@ $(function() {
 		$(this).parent().toggleClass('active');
 	});
 });
-</script>
 
-<?if($isPrivate && !$wasInvited && (!$isParticipating || !$loggedIn)){?>
-<div class="ink-grid all-50 large-80 medium-100 small-100">
-	<div class="column ink-alert block error" role="alert">
-		<h4>Private Event</h4>
-		<p>You don't have permissions to access this page!</p>
-		<?if($loggedIn){?>
-			<p>Private events are <strong>invite</strong> only, you must be invited to this event by other users.</p>
-		<?}else{?>
-			<p>Please <a href="login.php">log in</a> with your account first.</p>
-		<?}?>
-	</div>
-</div>
-<?}else{?>
-<script>
 google.maps.event.addDomListener(window, 'load', function() {
 	var map = new google.maps.Map(document.getElementById('map-location'), {
 		center: {lat: 0, lng: 0},
@@ -210,7 +207,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<!-- BEGIN EVENT MANAGEMENT -->
 	<?if($isOwner) {?>
 	<nav id="#nav" class="ink-navigation half-vertical-space">
-	    <ul class="pagination pills red">
+	    <ul class="pills red">
 	    	<!-- check if user is already participating on the event -->
 	        <li><a href="event_edit.php?id=<?=$thisEvent['idEvent']?>"><i class="fa fa-edit"></i></a></li>
 	        <li><a href="invite.php"><i class="fa fa-user-plus"></i></a></li>

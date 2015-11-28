@@ -1,4 +1,12 @@
 <?
+    $defaultUser = array(
+        'idUser' => 0,
+        'username' => 'Guest',
+        'name' => 'Troll Face',
+        'email' => 'nobody@loves.me',
+        'location' => 'Beijing',
+        'country' => 'cn');
+
     $stmt = $db->prepare('SELECT idUser, username FROM Users');
     $stmt->execute();
     $allUsers = array();
@@ -6,6 +14,8 @@
     while(($result = $stmt->fetch()) != null) {
         $allUsers[$result['idUser']] = $result;
     }
+
+    $allUsers[0] = $defaultUser;
     
     function users_listById($user_id) {     
         global $db;
@@ -13,16 +23,6 @@
         $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
-    }
-
-    function users_formatLocation($userData) {
-        
-        if (!is_array($userData) || !isset($userData['country']) || !isset($userData['location'])) {
-            $userData = $defaultUser;
-        }
-
-        $countryString = getCountry($userData['country']);
-        return "{$userData['location']}, $countryString";
     }
 
     function users_getNextId() {
@@ -36,6 +36,16 @@
         }
 
         return -1;
+    }
+
+    function users_formatLocation($userData) {
+        
+        if (!is_array($userData) || !isset($userData['country']) || !isset($userData['location'])) {
+            $userData = $defaultUser;
+        }
+
+        $countryString = getCountry($userData['country']);
+        return "{$userData['location']}, $countryString";
     }
 
     function users_getCountryFlag($userData) {
@@ -68,13 +78,9 @@
         return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
     }
 
-    function users_getSmallAvatar($userData) {
+    function users_getSmallAvatar($user_id) {
        
-        if (!is_array($userData) || !isset($userData['idUser'])) {
-            $userData = $defaultUser;
-        }
-
-        $user_id = intval($userData['idUser']);
+        $user_id = intval($user_id);
 
         if (!intval($user_id)) {
             $user_id = 0;
@@ -83,13 +89,9 @@
         return glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
     }
 
-    function users_viewProfile($userData) {
+    function users_viewProfile($user_id) {
 
-        if (!is_array($userData) || !isset($userData['idUser'])) {
-            $userData = $defaultUser;
-        }
-
-        $user_id = intval($userData['idUser']);
+        $user_id = intval($user_id);
 
         if (!intval($user_id)) {
             $user_id = 0;
@@ -236,7 +238,7 @@
     function users_idExists($user_id) {
         global $db;
         $stmt = $db->prepare('SELECT username FROM Users WHERE idUser = :idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_STR);
+        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetchAll();    
         return $result != false && is_array($result) && count($result) > 0;

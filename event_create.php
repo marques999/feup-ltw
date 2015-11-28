@@ -1,9 +1,11 @@
 <?
     include_once('database/connection.php');
-    	include_once('database/users.php');
+    include_once('database/session.php');
+    include_once('database/users.php');
 	include('template/header.php');
 ?>
 
+<?if($loggedIn){?>
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script>
 $(function() 
@@ -70,7 +72,6 @@ google.maps.event.addDomListener(window, 'load', function() {
 	});	
 });
 </script>
-
 <div class="ink-grid all-100">
 <div class="column-group gutters">
 	<form action="actions/action_create_event.php" class="ink-form ink-formvalidator all-50 small-100 tiny-100">
@@ -178,7 +179,16 @@ google.maps.event.addDomListener(window, 'load', function() {
 	</div>
 </div>
 </div>
+<?}else{?>
+<div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
+	<div class="column ink-alert block error">
+		<h4>Forbidden</h4>
+		<p>You don't have permission to access this page!</p>
+		<p>Please <a href="login.php">log in</a> with your account first.</p>
+	</div>
+</div>
+<?}?>
 
 <?
-	include('footer.php');
+	include('template/footer.php');
 ?>

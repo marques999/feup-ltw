@@ -1,7 +1,5 @@
 <?
 	include_once('../database/action.php');
-	include_once('../database/country.php');
-	include_once('../database/salt.php');
 	include_once('../database/users.php');
 	
 	if (isset($_POST['idEvent']) && isset($_POST['idUser'])) {

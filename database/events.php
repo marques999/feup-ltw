@@ -1,55 +1,92 @@
 <?
-	function events_listPublic() {		
+	$defaultEvent = array(
+		'idEvent' => 0,
+		'name' => 'Sample Event',
+		'date' => 0,
+		'location' => 'Test',
+		'description' => 'Hello World!',
+		'private' => 0,
+		'type' => 'Dummy',
+		'idUser' => 0);
+
+	$stmt = $db->prepare('SELECT * FROM Events');
+	$stmt->execute();
+	$allEvents = array();
+	$allEvents[0] = $defaultEvent;
+
+	while(($result = $stmt->fetch()) != null) {
+		$allEvents[$result['idEvent']] = $result;
+	}
+
+	function events_listPublic() {
 		global $db;
 		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 0');
-		$stmt->execute();	
+		$stmt->execute();
 		return $stmt->fetchAll();
 	}
 
-	function events_listPrivate() {		
+	function events_listPrivate() {
 		global $db;
 		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 1');
-		$stmt->execute();	
+		$stmt->execute();
 		return $stmt->fetchAll();
+	}
+
+	function events_idExists($event_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT idEvent FROM Events WHERE idEvent = :idEvent');
+		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result != false && is_array($result) && count($result) > 0;
+	}
+
+	function events_nameExists($name) {
+		global $db;
+		$stmt = $db->prepare('SELECT idEven FROM Events WHERE name = :name');
+		$stmt->bindParam(':idEvent', $name, PDO::PARAM_STR);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result != false && is_array($result) && count($result) > 0;
 	}
 
 	function events_viewEvent($eventData) {
 
-        if (!is_array($eventData) || !isset($eventData['idEvent'])) {
-            $userData = $defaultUser;
-        }
+		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+			$userData = $defaultUser;
+		}
 
-        $event_id = intval($eventData['idEvent']);
+		$event_id = intval($eventData['idEvent']);
 
-        if (!intval($event_id)) {
-            $event_id = 0;
-        }
+		if (!intval($event_id)) {
+			$event_id = 0;
+		}
 
-        return "view_event.php?id={$event_id}";     
-    }
+		return "view_event.php?id={$event_id}";
+	}
 
 	function events_getName($eventData) {
 
- 		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
-            $userData = $defaultUser;
-        }
+		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+			$userData = $defaultUser;
+		}
 
-		$event_id = intval($eventData['idEvent']);   
+		$event_id = intval($eventData['idEvent']);
 
-        if (!intval($event_id)) {
-            $event_id = 0;
-        }
+		if (!intval($event_id)) {
+			$event_id = 0;
+		}
 
-        if (isset($eventData['private']) && intval($eventData['private']) == 1) {
-        	return "<i class=\"fa fa-lock\"></i> {$eventData['name']}";
-        }
+		if (isset($eventData['private']) && intval($eventData['private']) == 1) {
+			return "<i class=\"fa fa-lock\"></i> {$eventData['name']}";
+		}
 
-        return $eventData['name'];
+		return $eventData['name'];
 	}
 
 	function events_listParticipants($event_id) {
 		global $db;
-		$stmt = $db->prepare('SELECT Users.idUser, Users.username FROM Users 
+		$stmt = $db->prepare('SELECT Users.idUser, Users.username FROM Users
 								JOIN UserEvents ON UserEvents.idEvent = :idEvent
 								AND UserEvents.idUser = Users.idUser');
 		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
@@ -91,7 +128,7 @@
 	}
 
 	function events_listTopEvents($top_n) {
-		
+
 		global $db;
 		$stmt = $db->prepare('SELECT Events.*, COUNT(*) FROM Events, UserEvents
 								WHERE Events.idEvent = UserEvents.idEvent
@@ -107,6 +144,6 @@
 		global $db;
 		$stmt = $db->prepare('SELECT DISTINCT type FROM Events');
 		$stmt->execute();
-		return $stmt->fetchAll();	
+		return $stmt->fetchAll();
 	}
 ?>

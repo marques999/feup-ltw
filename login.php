@@ -45,7 +45,7 @@
 					</span>
 				</div>
 			</div>
-			<div class="control-group column-group align-center half-gutters">
+			<div class="control-group column-group half-gutters">
 				<div class="control all-100">
 					<span class="align-center">
 						<input type="submit" name="sub" value="Sign In &gt;" class="ink-button success" />

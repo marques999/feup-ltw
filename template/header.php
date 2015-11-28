@@ -1,6 +1,5 @@
 <?
 	session_start();
-	include_once('template/defaults.php');
 	include('database/session.php');
 ?>
 <!DOCTYPE html>
@@ -12,9 +11,13 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <link rel="shortcut icon" href="img/favicon.ico">
-<link rel="stylesheet" type="text/css" href="css/ink-flex.min.css">
-<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="css/overrides.css">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="css/font-roboto.css">
+<link rel="stylesheet" type="text/css" href="css/ink.css">
+<link rel="stylesheet" type="text/css" href="css/my-defaults.css">
+<link rel="stylesheet" type="text/css" href="css/my-fonts.css">
+<link rel="stylesheet" type="text/css" href="css/my-navigation.css">
+<link rel="stylesheet" type="text/css" href="css/my-forms.css">
 <script type="text/javascript" src="js/modernizr.js"></script>
 <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
 <script type="text/javascript">
@@ -47,10 +50,10 @@ $(function() {
 <script type="text/javascript" src="js/autoload.min.js"></script>
 </head>
 <body>
-<header id="header-container" class="red">
+<header id="header-container">
 <h1>Cascading Events<small>social events network</small></h1>
 <nav id="header-menu" class="ink-navigation">
-<ul class="menu horizontal red">
+<ul class="menu horizontal">
 	<li id="nav_index"><a href="index.php"><i class="fa fa-home"></i></a></li>
 	<li id="nav_browse">
 		<a href="#"><i class="fa fa-search"></i> Browse</a>
@@ -63,8 +66,8 @@ $(function() {
 	</li>
 	<li id="nav_events"><a href="manage_events.php"><i class="fa fa-gears"></i> Manage Events</a></li>
 	<li id="nav_forum"><a href="forum.php"><i class="fa fa-comment"></i> Forum</a></li>
-	<div class="push-right all-20">
-		<li class="align-right all-100" id="nav_profile">
+	<div class="push-right fw-300">
+		<li class="align-right" id="nav_profile">
 		<?if(isset($_SESSION['username'])){?>
 			<a><i class="fa fa-user"></i> <?=$_SESSION['username']?></a>
 			<ul class="submenu">
@@ -74,7 +77,7 @@ $(function() {
 				<?}else{?>
 					<li><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></li>
 				<?}?>
-				<li><a href="actions/action_logout.php">Logout</a></li>
+				<li><a href="action_logout.php">Logout</a></li>
 			</ul>
 		<?}else{?>
 		<a href="login.php"><i class="fa fa-user"></i> Login</a>
