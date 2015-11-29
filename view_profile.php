@@ -27,31 +27,30 @@
 
 <?if($isOwner){?>
 	<script>
-	$(document).ready(function() {
+	$(function() {
 		$('#nav_profile').addClass('active');
 	});
 	</script>
 <?}?>
 
-<div class="ink-grid all-80 medium-90 small-90 tiny-100">
+<div class="ink-grid push-center all-75 large-75 medium-100 small-90 tiny-100">
 <div class="column-group gutters">
 
-
 	<!-- BEGIN USER AVATAR -->
-	<div class="column vertical-space align-center all-25 large-40 medium-40 small-100 tiny-100">
-		<img class="all-75" src="<?=users_getAvatar($thisUser)?>"/>
+	<div class="all-30 large-40 medium-40 small-100 tiny-100">
+		<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
 		<?if($isOwner){?>
-		<p class="all-100">
-		<a href="action_logout.php"><button class="vertical-space ink-button red"><i class="fa fa-key"></i> Log out</button></a>
-		<a href="delete_user.php?id=<?=$thisUser?>"><button class="vertical-space ink-button red"><i class="fa fa-user-times"></i> Remove</button></a>
-		</p>
+		<p class="align-center all-100">
+			<a href="action_logout.php"><button class="ink-button"><i class="fa fa-key"></i> Log out</button></a>
+			<a href="delete_user.php?id=<?=$thisUser?>"><button class="ink-button"><i class="fa fa-user-times"></i> Remove</button></a>
+			</p>
 		<?}?>
 	</div>
 	<!-- END USER AVATAR -->
 
 
 	<!-- BEGIN PROFILE INFORMATION -->
-	<div class="column all-75 large-60 medium-60 small-100 tiny-100">
+	<div class="column all-70 large-60 medium-60 small-100 tiny-100">
 	<img src="<?=users_getCountryFlag($thisUser)?>"></img>
 	<h1 class="quarter-top-space"><?=$thisUser['username']?></h1>
 	<p>

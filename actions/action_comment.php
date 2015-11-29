@@ -20,7 +20,7 @@
 			$stmt->bindParam(':message', $safeMessage, PDO::PARAM_STR);
 
 			if ($stmt->execute()) {
-				header("Location: ../view_event.php?id={$_POST['idEvent']}#comments");		
+				header("Location: ../view_event.php?id={$_POST['idEvent']}#comments");
 			}
 			else {
 				header("../database_error.php");
@@ -30,7 +30,8 @@
 
 	if (isset($_SERVER['HTTP_REFERER'])) {
 		$refererUrl = $_SERVER['HTTP_REFERER'];
-	} else {
+	}
+	else {
 		$refererUrl = 'index.php';
 	}
 

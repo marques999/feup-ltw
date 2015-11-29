@@ -32,12 +32,12 @@ $(function() {
 	var document_window = $(window);
 
 	document_window.scroll(function(){
-	    if (document_window.scrollTop() > header_height) {
-	       header_navigation.addClass('fixed-header');
-	    }
-	    else {
-	       header_navigation.removeClass('fixed-header');
-	    }
+		if (document_window.scrollTop() > header_height) {
+		   header_navigation.addClass('fixed-header');
+		}
+		else {
+		   header_navigation.removeClass('fixed-header');
+		}
 	});
 
 	document_window.resize(function() {
@@ -62,7 +62,7 @@ $(function() {
 			<li><a href="#">By Date</a></li>
 			<li><a href="#">By Type</a></li>
 			<li><a href="#">By Location</a></li>
-	    </ul>
+		</ul>
 	</li>
 	<li id="nav_events"><a href="manage_events.php"><i class="fa fa-gears"></i> Manage Events</a></li>
 	<li id="nav_forum"><a href="forum.php"><i class="fa fa-comment"></i> Forum</a></li>
@@ -70,8 +70,8 @@ $(function() {
 		<li class="align-right" id="nav_profile">
 		<?if(isset($_SESSION['username'])){?>
 			<a><i class="fa fa-user"></i> <?=$_SESSION['username']?></a>
-			<ul class="submenu">
-				<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>			
+			<ul class="submenu all-100">
+				<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>
 				<?if($numberInvites>0){?>
 					<li><strong><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></strong></li>
 				<?}else{?>

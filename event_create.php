@@ -1,20 +1,19 @@
 <?
-    include_once('database/connection.php');
-    include_once('database/session.php');
-    include_once('database/users.php');
+	include_once('database/connection.php');
+	include_once('database/session.php');
+	include_once('database/users.php');
 	include('template/header.php');
 ?>
-
 <?if($loggedIn){?>
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script>
-$(function() 
-{     	
-	currentTime = new Date(); 
-	$('input#hours').val(currentTime.getHours());	
-	$('input#minutes').val(currentTime.getMinutes());		
+$(function()
+{
+	currentTime = new Date();
+	$('input#hours').val(currentTime.getHours());
+	$('input#minutes').val(currentTime.getMinutes());
 	$.getJSON("json/events.json", function(data)
-	{ 	
+	{
 		$.each(data, function(index, item)
 		{
 			$("select#type").append($("<option></option>").text(item).val(item));
@@ -25,7 +24,7 @@ $(function()
 google.maps.event.addDomListener(window, 'load', function() {
 
 	var defaultMarker = new google.maps.Marker({
-		map: gmaps_map, 
+		map: gmaps_map,
 		position: {'lat': 44.5403, 'lng': -78.5463}
 	});
 
@@ -38,9 +37,9 @@ google.maps.event.addDomListener(window, 'load', function() {
 	var locationString = $("input#location");
 	var marker = null;
 
-	if (navigator.geolocation) 
+	if (navigator.geolocation)
 	{
-		navigator.geolocation.getCurrentPosition(function(position) 
+		navigator.geolocation.getCurrentPosition(function(position)
 		{
 			marker = new google.maps.Marker(
 			{
@@ -49,14 +48,14 @@ google.maps.event.addDomListener(window, 'load', function() {
 			});
 			locationString.val(marker.getPosition().toString());
 			gmaps_map.setCenter(marker.getPosition());
-		}, function() 
+		}, function()
 		{
 			gmaps_map.setCenter(defaultMarker.getPosition());
 		});
 	}
-	$('input#location').keydown(function(event) 
+	$('input#location').keydown(function(event)
 	{
-		if (event.keyCode == 13 || event.which == 13) 
+		if (event.keyCode == 13 || event.which == 13)
 		{
 			geocoder.geocode({'address':locationString.val()}, function(results, status)
 			{
@@ -69,18 +68,18 @@ google.maps.event.addDomListener(window, 'load', function() {
 			});
 			event.preventDefault();
 		}
-	});	
+	});
 });
 </script>
-<div class="ink-grid all-100">
-<div class="column-group gutters">
-	<form action="actions/action_create_event.php" class="ink-form ink-formvalidator all-50 small-100 tiny-100">
+<div class="ink-grid push-center all-60 large-60 medium-80 small-100 tiny-100">
+<div class="column all-70 gutters">
+	<form action="actions/action_create_event.php" class="ink-form ink-formvalidator">
 		<fieldset>
 			<legend class="align-center">Create Event</legend>
 			<div class="control-group required column-group half-gutters">
 				<label for="name" class="all-30 align-right">Name:</label>
 				<div class="control all-60">
-					<input name="name" id="name" type="text" data-rules="required|alpha" placeholder="Please enter the event name">			
+					<input name="name" id="name" type="text" data-rules="required|alpha" placeholder="Please enter the event name">
 				</div>
 				<!--
 				<label for="private">Private</label>
@@ -89,12 +88,13 @@ google.maps.event.addDomListener(window, 'load', function() {
 				</div>
 				-->
 			</div>
-			
+
+
 			<!-- BEGIN EVENT DESCRIPTION -->
 			<div class="control-group required column-group half-gutters">
 				<label for="description" class="all-30 align-right">Description:</label>
 				<div class="control all-60">
-					<textarea name="description" rows="8" cols="60" data-rules="required|alpha" placeholder="Please enter the event description"></textarea>			
+					<textarea name="description" rows="8" cols="60" data-rules="required|alpha" placeholder="Please enter the event description"></textarea>
 				</div>
 			</div>
 			<!-- END EVENT DESCRIPTION -->
@@ -105,18 +105,12 @@ google.maps.event.addDomListener(window, 'load', function() {
 				<label for="location" class="all-30 align-right">Location:</label>
 				<div class="control append-symbol all-60">
 					<span>
-					<input type="text" id="location" data-rules="required">			
+					<input type="text" id="location" data-rules="required">
 					<i class="fa fa-globe"></i>
 					</span>
-				</div>			
+				</div>
 			</div>
 			<!-- END EVENT DESCRIPTION -->
-
-
-			<!-- BEGIN EVENT MAP -->
-			<div style="height:300px" class="control append-symbol all-60" id="location-map">
-			</div>
-			<!-- END EVENT MAP -->
 
 
 			<!-- BEGIN EVENT TYPE -->
@@ -136,19 +130,19 @@ google.maps.event.addDomListener(window, 'load', function() {
 			<!-- BEGIN EVENT DATE -->
 			<div class="control-group required column-group half-gutters">
 				<label for="date" class="all-30 align-right">Date/Time</label>
-		        <div class="control all-40">
-		            <input name="date" id="date" type="text" class="ink-datepicker" data-format="d-m-Y" />
-		        </div>
-		        <div class="control all-10">
-		       		<input name="hours" id="hours" type="number" value="12">
-		        </div>
-		     	<span class="quarter-left-space">
-		     		:
-		     	</span>
-		        <div class="control all-10">
-		        	<input name="minutes" id="minutes" type="number" value="30">
-		        </div>
-		    </div>
+				<div class="control all-40">
+					<input name="date" id="date" type="text" class="ink-datepicker" data-format="d-m-Y" />
+				</div>
+				<div class="control all-10">
+					<input name="hours" id="hours" type="number" value="12">
+				</div>
+				<span class="quarter-left-space">
+					:
+				</span>
+				<div class="control all-10">
+					<input name="minutes" id="minutes" type="number" value="30">
+				</div>
+			</div>
 			<!-- END EVENT DATE -->
 
 
@@ -174,13 +168,24 @@ google.maps.event.addDomListener(window, 'load', function() {
 			<!-- END EVENT SUBMIT -->
 		</fieldset>
 	</form>
-	<div class="all-20 align-center small-100 tiny-100">
-		<img src="holder.js/200x200/auto/ink" alt="">
+	</div>
+	<div class="padding all-30 align-center small-100 tiny-100">
+		<!-- BEGIN EVENT PHOTO -->
+		<div class="vertical-space">
+			<img src="holder.js/200x200/auto/ink" alt="">
+		</div>
+		<!-- END EVENT PHOTO -->
+
+		<!-- BEGIN EVENT MAP -->
+		<div class="control-group column-group half-gutters">
+			<div style="height:400px" class="control all-100" id="location-map">
+			</div>
+		</div>
+		<!-- END EVENT MAP -->
 	</div>
 </div>
-</div>
 <?}else{?>
-<div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
+<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 	<div class="column ink-alert block error">
 		<h4>Forbidden</h4>
 		<p>You don't have permission to access this page!</p>
@@ -188,7 +193,6 @@ google.maps.event.addDomListener(window, 'load', function() {
 	</div>
 </div>
 <?}?>
-
 <?
 	include('template/footer.php');
 ?>

@@ -49,32 +49,40 @@
 	function thread_listById($thread_id) {
 		global $db;
 		$stmt = $db->prepare('SELECT ForumThread.*, username FROM ForumThread JOIN Users
-			ON ForumThread.idThread = :idThread
-			AND Users.idUser = ForumThread.idUser');
+			ON ForumThread.idThread = :idThread	AND Users.idUser = ForumThread.idUser');
 		$stmt->bindParam(':idThread', $thread_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	function post_listById($post_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT ForumPost.*, username FROM ForumPost JOIN Users
+			ON ForumPost.idPost = :idPost
+			AND Users.idUser = ForumPost.idUser');
+		$stmt->bindParam(':idPost', $post_id, PDO::PARAM_INT);
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
 
 	function thread_listPosts($thread_id) {
 		global $db;
-		$stmt = $db->prepare('SELECT ForumPost.*, username FROM ForumPost JOIN Users 
-			ON ForumPost.idThread = :idThread
-			AND Users.idUser = ForumPost.idUser');
+		$stmt = $db->prepare('SELECT ForumPost.*, username FROM ForumPost JOIN Users
+			ON ForumPost.idThread = :idThread AND Users.idUser = ForumPost.idUser');
 		$stmt->bindParam(':idThread', $thread_id, PDO::PARAM_INT);
 		$stmt->execute();
-    	$allPosts = array();
+		$allPosts = array();
 
-    	while(($result = $stmt->fetch()) != null) {
-        	$allPosts[$result['idPost']] = $result;
-   		}
+		while(($result = $stmt->fetch()) != null) {
+			$allPosts[$result['idPost']] = $result;
+		}
 
-   		return $allPosts;
+		return $allPosts;
 	}
 
 	function forum_lastReplies() {
 		global $db;
-		$stmt = $db->prepare('SELECT idThread, idUser, MAX(timestamp) AS timestamp FROM ForumPost GROUP BY idThread');	
+		$stmt = $db->prepare('SELECT idThread, idUser, MAX(timestamp) AS timestamp FROM ForumPost GROUP BY idThread');
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}

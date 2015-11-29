@@ -6,7 +6,7 @@
 	if (isset($_POST['idThread']) && $loggedIn) {
 		$threadId = intval($_POST['idThread']);
 		$threadExists = forum_idExist($threadId);
-		
+
 		if ($threadId > 0 && $threadExists) {
 			$thread = thread_listById($threadId);
 
@@ -14,7 +14,7 @@
 				$stmt = $db->prepare('DELETE FROM ForumThread WHERE idUser = :idUser AND idThread = :idThread');
 				$stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
 				$stmt->bindParam(':idThread', $threadId, PDO::PARAM_INT);
-				
+
 				if (!$stmt->execute()) {
 					header("../database_error.php");
 				}

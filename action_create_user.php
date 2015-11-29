@@ -7,9 +7,9 @@
 ?>
 
 <script>
-	$(document).ready(function() {
-		$('#nav_profile').addClass('active');
-	});
+$(function() {
+	$('#nav_profile').addClass('active');
+});
 </script>
 
 <?
@@ -65,7 +65,7 @@ $emailExists = users_emailExists($_POST['email']);
 	echo $mediumFile.'<br>';
 
 	if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
-	    	?><div class="column-group half-vertical-space">
+			?><div class="column-group half-vertical-space">
 		<div class="column all-20 large-15 medium-10 small-0 tiny-0"></div>
 		<div class="column all-60 large-70 medium-80 small-100 tiny-100 ink-alert block error" role="alert">
 			<h4>Database Error</h4>
@@ -122,9 +122,9 @@ $emailExists = users_emailExists($_POST['email']);
 
 	// preserve transparency from original image (PNG/GIF only)
 	if ($fileExtension == 'gif' || $fileExtension == 'png') {
-	    imagecolortransparent($resizedImage, imagecolorallocatealpha($resizedImage, 0, 0, 0, 127));
-	    imagealphablending($resizedImage, false);
-	    imagesavealpha($resizedImage, true);
+		imagecolortransparent($resizedImage, imagecolorallocatealpha($resizedImage, 0, 0, 0, 127));
+		imagealphablending($resizedImage, false);
+		imagesavealpha($resizedImage, true);
 	}
 
 	imagecopyresampled($resizedImage, $originalImage,
@@ -149,9 +149,9 @@ $emailExists = users_emailExists($_POST['email']);
 
 	// preserve transparency from original image (PNG/GIF only)
 	if ($fileExtension == 'gif' || $fileExtension == 'png') {
-	    imagecolortransparent($thumbnailImage, imagecolorallocatealpha($thumbnailImage, 0, 0, 0, 127));
-	    imagealphablending($thumbnailImage, false);
-	    imagesavealpha($thumbnailImage, true);
+		imagecolortransparent($thumbnailImage, imagecolorallocatealpha($thumbnailImage, 0, 0, 0, 127));
+		imagealphablending($thumbnailImage, false);
+		imagesavealpha($thumbnailImage, true);
 	}
 
 	if ($newHeight == $newWidth) {

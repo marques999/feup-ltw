@@ -10,7 +10,7 @@
 		if ($userId > 0 && $userExists && $thisUser == $userId) {
 			$stmt = $db->prepare('DELTE FROM Users WHERE idUser = :idUser');
 			$stmt->bindParam(':idUser', $userId, PDO::PARAM_INT);
-			
+
 			if ($stmt->execute() == false) {
 				header("../database_error.php");
 			}

@@ -28,6 +28,10 @@
 	float: left;
 }
 
+.clear {
+  clear: both !important;
+}
+
 .push-center {
 	float: none !important;
 	margin-left: auto;

@@ -96,20 +96,36 @@
 
 	function events_countParticipants() {
 		global $db;
+		global $defaultEvent;
 		$stmt = $db->prepare('SELECT Events.idEvent, COUNT(UserEvents.idEvent) AS count FROM Events
 								LEFT JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
 								GROUP BY Events.idEvent');
 		$stmt->execute();
-		return $stmt->fetchAll();
+		$eventList = array();
+		$eventList[0] = $defaultEvent;
+
+		while(($result = $stmt->fetch()) != null) {
+			$eventList[$result['idEvent']] = $result;
+		}
+
+		return $eventList;
 	}
 
 	function events_countInvites() {
 		global $db;
+		global $defaultEvent;
 		$stmt = $db->prepare('SELECT Events.idEvent, COUNT(Invites.idEvent) AS count FROM Events
 								LEFT JOIN Invites ON Invites.idEvent = Events.idEvent
 								GROUP BY Events.idEvent');
 		$stmt->execute();
-		return $stmt->fetchAll();
+		$eventList = array();
+		$eventList[0] = $defaultEvent;
+
+		while(($result = $stmt->fetch()) != null) {
+			$eventList[$result['idEvent']] = $result;
+		}
+
+		return $eventList;
 	}
 
 	function events_listById($event_id) {

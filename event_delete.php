@@ -18,22 +18,20 @@
 		}
 	}
 ?>
-
 <script>
-	$(document).ready(function() {
-		$('#nav_events').addClass('active');
-	});
+$(function(){
+	$('#nav_events').addClass('active');
+});
 </script>
-
-<div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
+<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 <?if($loggedIn){?>
 	<?if($ownEvent){?>
-	<div class="column all-100 ink-alert block info">
+	<div class="column ink-alert block info">
 		<h4>Delete Event</h4>
 		<p>Are you sure you want to delete <b><?=$thisEvent['name']?></b>?</p>
 		<form action="actions/action_delete_event.php" method="post" class="ink-form">
-		<div class="control-group column-group half-gutters">
-			<div class="control all-100 align-center">
+		<div class="control-group half-gutters">
+			<div class="control push-center all-80">
 				<span class="align-center">
 					<input type="hidden" name="idEvent" value="<?=$eventId?>"/>
 					<input type="submit" name="result" value="Yes" class="ink-button all-20"/>
@@ -58,7 +56,6 @@
 </div>
 <?}?>
 </div>
-
 <?
 	include('template/footer.php');
 ?>

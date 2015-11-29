@@ -25,7 +25,8 @@
 		$isPrivate = ($thisEvent['private'] == 1);
 		$thisParticipants = events_listParticipants($eventId);
 		$thisComments = events_listTopComments($eventId, 5);
-		$getOwner = users_listById($thisEvent['idUser']);
+		$ownerId = $thisEvent['idUser'];
+		$getOwner = users_listById($ownerId);
 
 		if (count($getOwner) > 0) {
 			$thisOwner = $getOwner[0];
@@ -54,7 +55,7 @@
 ?>
 
 <?if($isPrivate && !$isOwner && !($wasInvited || $isParticipating)){?>
-<div class="ink-grid all-50 large-70 medium-80 small-100 tiny-100">
+<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 	<div class="column ink-alert block error">
 		<h4>Private Event</h4>
 		<p>You don't have permissions to access this page!</p>
@@ -159,13 +160,13 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 	mapContainer.hide();
 	geocoder.geocode({'location':latlng}, function(results, status) {
-	    if (status === google.maps.GeocoderStatus.OK && results[1]) {
+		if (status === google.maps.GeocoderStatus.OK && results[1]) {
 			marker = new google.maps.Marker({position:latlng,map:map});
 			map.setZoom(16);
 			infowindow.setContent('<b>' + results[1].formatted_address + "</b><p>" + marker.getPosition().toString() + '</p>');
 			locationString.text(results[1].formatted_address);
-	    }
-	    google.maps.event.addListener(marker, 'click', function(event) {
+		}
+		google.maps.event.addListener(marker, 'click', function(event) {
 			infowindow.open(map,marker);
 		});
 	});
@@ -174,56 +175,52 @@ google.maps.event.addDomListener(window, 'load', function() {
 		mapContainer.slideToggle('fast', function() {
 			if (mapContainer.is(":visible")) {
 				google.maps.event.trigger(map, 'resize');
-	        	map.setCenter(marker.getPosition());
-	        	infowindow.open(map, marker);
+				map.setCenter(marker.getPosition());
+				infowindow.open(map, marker);
 			}
 		});
 	});
 });
 </script>
-<section class="column-group gutters article">
-<div class="xlarge-15 large-15 medium-10 small-5 tiny-5">
-</div>
-<div class="xlarge-70 large-70 medium-80 small-90 tiny-90">
-	<article>
-
-	<!-- BEGIN EVENT TITLE -->
-	<div>
-		<h1 class="slab no-margin"><?=$thisEvent['name']?></h1>
-		<h5 class="slab"><?=$thisEvent['type']?></h5>
-	</div>
-	<!-- END EVENT TITLE -->
-
+<div class="ink-grid push-center all-70 large-75 medium-80 small-90 tiny-100">
 
 	<!-- BEGIN USER AVATAR -->
 	<div class="panel push-right">
-		<img src="<?=users_getSmallAvatar($thisOwner)?>"/>
+		<img src="<?=users_getSmallAvatar($ownerId)?>"/>
 		<b class="quarter-space">
-		<a href="<?=users_viewProfile($thisOwner)?>"><?=$thisOwner['username']?></a>
+		<a href="<?=users_viewProfile($ownerId)?>"><?=$thisOwner['username']?></a>
 	</div>
 	<!-- END USER AVATAR -->
 
 
+	<!-- BEGIN EVENT TITLE -->
+	<div class="push-left half-vertical-space">
+		<h1 class="slab no-margin"><?=$thisEvent['name']?></h1>
+		<h5 class="slab no-margin"><?=$thisEvent['type']?></h5>
+	</div>
+	<!-- END EVENT TITLE -->
+
+
 	<!-- BEGIN EVENT MANAGEMENT -->
 	<?if($isOwner) {?>
-	<nav id="#nav" class="ink-navigation half-vertical-space">
-	    <ul class="pills red">
-	    	<!-- check if user is already participating on the event -->
-	        <li><a href="event_edit.php?id=<?=$thisEvent['idEvent']?>"><i class="fa fa-edit"></i></a></li>
-	        <li><a href="invite.php"><i class="fa fa-user-plus"></i></a></li>
-	        <li><a href="event_delete.php?id=<?=$thisEvent['idEvent']?>"><i class="fa fa-trash"></i></a></li>
-	    </ul>
+	<nav id="#nav" class="ink-navigation clear">
+		<ul class="pills">
+			<!-- check if user is already participating on the event -->
+			<li><a href="event_edit.php?id=<?=$eventId?>"><i class="fa fa-edit"></i></a></li>
+			<li><a href="invite.php"><i class="fa fa-user-plus"></i></a></li>
+			<li><a href="event_delete.php?id=<?=$eventId?>"><i class="fa fa-trash"></i></a></li>
+		</ul>
 	</nav>
 	<?}?>
 	<!-- END EVENT MANAGEMENT -->
 
 
 	<!-- BEGIN EVENT DATE -->
-	<div class="half-vertical-space">
+	<div class="clear half-vertical-space">
 		<p class="no-margin fw-medium">
 			<i class="fa fa-calendar"></i>
 			<b>Date:</b>
-			<?=date("l, d/m/Y H:i", $thisEvent['date'])?>
+			<?=gmdate("l, d/m/Y H:i", $thisEvent['date'])?>
 		</p>
 	</div>
 	<!-- END EVENT DATE -->
@@ -251,7 +248,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 
 	<!-- BEGIN EVENT MAP -->
-	<div class="panel padding all-100 half-vertical-space" id="map-container">
+	<div class="panel all-100 padding half-vertical-space" id="map-container">
 		<div style="height:400px" class="all-100" id="map-location"></div>
 	</div>
 	<!-- END EVENT MAP -->
@@ -265,10 +262,10 @@ google.maps.event.addDomListener(window, 'load', function() {
 		</span>
 		<div class="push-right">
 			<small>
-				<button id="accept-button" class="ink-button red"><i class="fa fa-thumbs-up"></i> Accept</button>
+				<button id="accept-button" class="ink-button"><i class="fa fa-thumbs-up"></i> Accept</button>
 			</small>
 			<small>
-				<button id ="reject-button" class="ink-button red"><i class="fa fa-ban"></i> Decline</button>
+				<button id ="reject-button" class="ink-button"><i class="fa fa-ban"></i> Decline</button>
 			</small>
 		</div>
 	</div>
@@ -278,8 +275,8 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 	<!-- BEGIN USER ACTIONS -->
 	<?if($loggedIn){?>
-	<nav id="#nav" class="ink-navigation half-vertical-space">
-	    <ul class="pagination pills red">
+	<nav id="#nav" class="ink-navigation all-100 half-vertical-space">
+		<ul class="pills">
 		<?if($isParticipating){?>
 			<li class="active"><a id="follow-button"><i class="fa fa-check"></i> Following</a></li>
 		<?}else{?>
@@ -295,58 +292,66 @@ google.maps.event.addDomListener(window, 'load', function() {
 		<?}else{?>
 			<li class="disabled"><a href="#nav"><i class="fa fa-upload"></i> Upload Photos</a></li>
 		<?}?>
-	    </ul>
+		</ul>
 	</nav>
 	<?}?>
 	<!-- END USER ACTIONS -->
 
 	<!-- BEGIN PARTICIPANTS SECTION -->
 	<h2>Participants (<?=$numberParticipants?>)</h2>
-	<div id="table-participants" class="all-100 half-vertical-space">
+	<div class="half-vertical-space" id="table-participants">
 		<?if($numberParticipants>0){
 		for($i=0;$i<$numberParticipants;$i++) {
 			$currentParticipant=$thisParticipants[$i];
+			$currentParticipantId=$currentParticipant['idUser'];
 
 			if($i%3==0){?>
 				<div class="column-group half-gutters">
 			<?}?>
 
-			<div class="all-30 large-35 medium-40 small-50 tiny-50">
-			<img src="<?=users_getSmallAvatar($currentParticipant)?>"/>
-			<b class="quarter-space">
-			<a href="<?=users_viewProfile($currentParticipant)?>"><?=$currentParticipant['username']?></a>
-			</b></div>
+			<div class="all-33 medium-50 small-50 tiny-100">
+				<img src="<?=users_getSmallAvatar($currentParticipantId)?>"/>
+				<b class="quarter-space">
+				<a href="<?=users_viewProfile($currentParticipantId)?>"><?=$currentParticipant['username']?></a>
+				</b>
+			</div>
 
 			<?if ($i == count($thisParticipants) - 1){?>
-				</div>
+					</div>
 			<?}?>
 		<?}?>
 		<?}else{?>
-			<p>This event has no users participating :(</p>
+			<p class="panel">This event has no users participating :(</p>
 		<?}?>
 	</div>
 	<!-- END PARTICIPANTS SECTION -->
 
 
 	<!-- BEGIN COMMENTS SECTION -->
-	<?if($isParticipating||$isOwner){?>
-		<h2 id="comments">Comments (<?=$numberComments?>) </h2>
-		<div class="column-group vertical-space">
-		<?if ($numberComments>0) {
+	<?if($isParticipating || $isOwner){?>
+		<h2 class="no-margin" id="comments">Comments (<?=$numberComments?>) </h2>
+		<div class="column-group all-100 half-vertical-space">
+		<?if($numberComments > 0) {
 			foreach($thisComments as $currentComment) {
-				$commentAuthor = $allUsers[$currentComment['idUser']];?>
-				<div class="column all-100">
-					<img class="push-left half-right-space" src="<?=users_getSmallAvatar($currentComment)?>"/>
-					<a href="<?=users_viewProfile($commentAuthor)?>"><?=$commentAuthor['username']?></a>
-					<small><?=date("l, d/m/Y H:i", $currentComment['timestamp'])?></small>
-					<p class="fw-medium"><?=$currentComment['message']?></p>
-				</div>
+			if (isset($currentComment['idUser'])) {
+				$commentAuthorId = $currentComment['idUser'];
+			}
+			else {
+				$commentAuthorId = 0;
+			}
+			$commentAuthor = $allUsers[$commentAuthorId];?>
+			<div class="column all-100 half-vertical-space">
+				<img class="push-left half-right-space" src="<?=users_getSmallAvatar($commentAuthorId)?>"/>
+				<a href="<?=users_viewProfile($commentAuthorId)?>"><?=$commentAuthor['username']?></a>
+				<small><?=gmdate("l, d/m/Y H:i", $currentComment['timestamp'])?></small>
+				<p class="fw-medium"><?=$currentComment['message']?></p>
+			</div>
 			<?}?>
+			</div>
 		<?}else{?>
-			<p>This event has no comments :(</p>
+			<p class="panel">This event has no comments :(</p>
 		<?}?>
 	<?}?>
-	</div>
 	<!-- END COMMENTS SECTION -->
 
 
@@ -355,27 +360,24 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<form action="actions/action_comment.php" method="POST" class="ink-form ink-formvalidation all-100">
 		<input type="hidden" name="idUser" value="<?=$_SESSION['userid']?>"></input>
 		<input type="hidden" name="idEvent" value="<?=$eventId?>"></input>
-		<div class="control-group column-group half-gutters">
-			<div class="control required all-100">
-				<textarea name="message" rows="4" cols="80" placeholder="Insert your comment here..."></textarea>
+		<div class="control-group">
+			<div class="control required">
+				<textarea name="message" rows="4" cols="80" placeholder="Write your comment here..."></textarea>
 			</div>
 		</div>
-		<div class="control-group column-group half-gutters">
-			<div class="control all-100">
-				<button type="submit" name="sub" class="ink-button red success">
-				<i class="fa fa-share"></i> Send
-				</button>
-				<button type="reset" name="sub" value="Clear" class="ink-button red">
-				<i class="fa fa-eraser"></i> Clear
-				</button>
-			</div>
+		<div class="control-group half-gutters">
+			<button type="submit" name="sub" class="ink-button">
+			<i class="fa fa-share"></i> Send
+			</button>
+			<button type="reset" name="sub" value="Clear" class="ink-button">
+			<i class="fa fa-eraser"></i> Clear
+			</button>
 		</div>
 	</form>
 	</div>
 	<!-- END DYNAMIC SECTION -->
-	</article>
 </div>
-</section>
+
 <?
 	}
 	include('template/footer.php')

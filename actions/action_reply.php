@@ -16,7 +16,7 @@
 		}
 
 		if ($userExists) {
-			
+
 			$safeMessage = strip_tags_content($_POST['message']);
 
 			if ($isQuote) {
@@ -33,7 +33,7 @@
 			$stmt->bindParam(':timestamp', $currentTime, PDO::PARAM_INT);
 
 			if ($stmt->execute()) {
-				header("Location: ../view_thread.php?id={$thisThread}#comments");		
+				header("Location: ../view_thread.php?id={$thisThread}#comments");
 			}
 			else {
 				header("../database_error.php");

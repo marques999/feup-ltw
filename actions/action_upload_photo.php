@@ -17,7 +17,7 @@
 	if ($imageSource == 'user') {
 		$outputFilename = "{$thisUser}_original.{$fileExtension}";
 	}
-	
+
 	$uploadFile = $uploadDirectory . $outputFilename;
 	$smallFile = "../img/avatars/{$thisUser}_small.{$fileExtension}";
 	$mediumFile = "../img/avatars/{$thisUser}.{$fileExtension}";
@@ -28,7 +28,7 @@
 	echo $mediumFile.'<br>';
 
 	if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
-	    exit(0);
+		exit(0);
 	}
 
 	$originalImage = null;
@@ -76,9 +76,9 @@
 
 	// preserve transparency from original image (PNG/GIF only)
 	if ($fileExtension == 'gif' || $fileExtension == 'png') {
-	    imagecolortransparent($resizedImage, imagecolorallocatealpha($resizedImage, 0, 0, 0, 127));
-	    imagealphablending($resizedImage, false);
-	    imagesavealpha($resizedImage, true);
+		imagecolortransparent($resizedImage, imagecolorallocatealpha($resizedImage, 0, 0, 0, 127));
+		imagealphablending($resizedImage, false);
+		imagesavealpha($resizedImage, true);
 	}
 
 	imagecopyresampled($resizedImage, $originalImage,
@@ -102,9 +102,9 @@
 
 	// preserve transparency from original image (PNG/GIF only)
 	if ($fileExtension == 'gif' || $fileExtension == 'png') {
-	    imagecolortransparent($thumbnailImage, imagecolorallocatealpha($thumbnailImage, 0, 0, 0, 127));
-	    imagealphablending($thumbnailImage, false);
-	    imagesavealpha($thumbnailImage, true);
+		imagecolortransparent($thumbnailImage, imagecolorallocatealpha($thumbnailImage, 0, 0, 0, 127));
+		imagealphablending($thumbnailImage, false);
+		imagesavealpha($thumbnailImage, true);
 	}
 
 	if ($newHeight == $newWidth) {

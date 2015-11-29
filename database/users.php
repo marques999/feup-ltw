@@ -1,272 +1,272 @@
 <?
-    $defaultUser = array(
-        'idUser' => 0,
-        'username' => 'Guest',
-        'name' => 'Troll Face',
-        'email' => 'nobody@loves.me',
-        'location' => 'Beijing',
-        'country' => 'cn');
+	$defaultUser = array(
+		'idUser' => 0,
+		'username' => 'Guest',
+		'name' => 'Troll Face',
+		'email' => 'nobody@loves.me',
+		'location' => 'Beijing',
+		'country' => 'cn');
 
-    $stmt = $db->prepare('SELECT idUser, username FROM Users');
-    $stmt->execute();
-    $allUsers = array();
+	$stmt = $db->prepare('SELECT idUser, username FROM Users');
+	$stmt->execute();
+	$allUsers = array();
 
-    while(($result = $stmt->fetch()) != null) {
-        $allUsers[$result['idUser']] = $result;
-    }
+	while(($result = $stmt->fetch()) != null) {
+		$allUsers[$result['idUser']] = $result;
+	}
 
-    $allUsers[0] = $defaultUser;
-    
-    function users_listById($user_id) {     
-        global $db;
-        $stmt = $db->prepare('SELECT * FROM Users WHERE idUser = :idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+	$allUsers[0] = $defaultUser;
 
-    function users_getNextId() {
-        global $db;
-        $stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Users'");
-        $stmt->execute();
-        $result = $stmt->fetch();
-        
-        if ($result != false && is_array($result)) {
-            return $result['seq'];
-        }
+	function users_listById($user_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT * FROM Users WHERE idUser = :idUser');
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
 
-        return -1;
-    }
+	function users_getNextId() {
+		global $db;
+		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Users'");
+		$stmt->execute();
+		$result = $stmt->fetch();
 
-    function users_formatLocation($userData) {
-        
-        if (!is_array($userData) || !isset($userData['country']) || !isset($userData['location'])) {
-            $userData = $defaultUser;
-        }
+		if ($result != false && is_array($result)) {
+			return $result['seq'];
+		}
 
-        $countryString = getCountry($userData['country']);
-        return "{$userData['location']}, $countryString";
-    }
+		return -1;
+	}
 
-    function users_getCountryFlag($userData) {
+	function users_formatLocation($userData) {
 
-        if (!is_array($userData) || !isset($userData['country'])) {
-            $userData = $defaultUser;
-        }
+		if (!is_array($userData) || !isset($userData['country']) || !isset($userData['location'])) {
+			$userData = $defaultUser;
+		}
 
-        $country = $userData['country'];
-        
-        if (strlen($country) != 2) {
-            $country = 'europeanunion.png';
-        }
+		$countryString = getCountry($userData['country']);
+		return "{$userData['location']}, $countryString";
+	}
 
-        return "img/flags/$country.png";
-    }
+	function users_getCountryFlag($userData) {
 
-    function users_getAvatar($userData) {
+		if (!is_array($userData) || !isset($userData['country'])) {
+			$userData = $defaultUser;
+		}
 
-        if (!is_array($userData) || !isset($userData['idUser'])) {
-            $userData = $defaultUser;
-        }
+		$country = $userData['country'];
 
-        $user_id = intval($userData['idUser']);
-        
-        if (!intval($user_id)) {
-            $user_id = 0;
-        }
+		if (strlen($country) != 2) {
+			$country = 'europeanunion.png';
+		}
 
-        return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
-    }
+		return "img/flags/$country.png";
+	}
 
-    function users_getSmallAvatar($user_id) {
-       
-        $user_id = intval($user_id);
+	function users_getAvatar($userData) {
 
-        if (!intval($user_id)) {
-            $user_id = 0;
-        }
+		if (!is_array($userData) || !isset($userData['idUser'])) {
+			$userData = $defaultUser;
+		}
 
-        return glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
-    }
+		$user_id = intval($userData['idUser']);
 
-    function users_viewProfile($user_id) {
+		if (!intval($user_id)) {
+			$user_id = 0;
+		}
 
-        $user_id = intval($user_id);
+		return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
+	}
 
-        if (!intval($user_id)) {
-            $user_id = 0;
-        }
+	function users_getSmallAvatar($user_id) {
 
-        return "view_profile.php?id={$user_id}";     
-    }
+		$user_id = intval($user_id);
 
-    function numberUsers() {   
-        global $db;
-        $stmt = $db->prepare('SELECT COUNT(*) AS count FROM Users');
-        $stmt->execute();
-        $result = $stmt->fetchAll();
+		if (!intval($user_id)) {
+			$user_id = 0;
+		}
 
-        if ($result != false && is_array($result) && count($result) > 0) {
-             return $result[0]['count'];
-        }
+		return glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
+	}
 
-        return 0;
-    }
+	function users_viewProfile($user_id) {
 
-    function users_listAllEvents($user_id, $private) {
+		$user_id = intval($user_id);
 
-        global $db;
+		if (!intval($user_id)) {
+			$user_id = 0;
+		}
 
-        if ($private) {
-            $stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events 
-                ON UserEvents.idUser = :idOwner
-                AND Events.idEvent = UserEvents.idEvent
-                AND Users.idUser = UserEvents.idUser');
-        }
-        else {
-            $stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events 
-                ON UserEvents.idUser = :idOwner
-                AND Events.idEvent = UserEvents.idEvent
-                AND Users.idUser = UserEvents.idUser
-                AND (Events.private = 0
-                OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
-            $stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
-        }
+		return "view_profile.php?id={$user_id}";
+	}
 
-        $stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+	function numberUsers() {
+		global $db;
+		$stmt = $db->prepare('SELECT COUNT(*) AS count FROM Users');
+		$stmt->execute();
+		$result = $stmt->fetchAll();
 
-    function users_listOwnEvents($user_id, $private) {    
-        global $db;
+		if ($result != false && is_array($result) && count($result) > 0) {
+			 return $result[0]['count'];
+		}
 
-        if ($private) {
-            $stmt = $db->prepare('SELECT DISTINCT * FROM Events WHERE idUser = :idOwner');
-        }
-        else {
-             $stmt = $db->prepare('SELECT DISTINCT Events.* FROM Events 
-                JOIN UserEvents ON Events.idUser = :idOwner
-                AND UserEvents.idEvent = Events.idEvent
-                AND (Events.private = 0 OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
-             $stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
-        }
-    
-        $stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+		return 0;
+	}
 
-    function users_isParticipating($user_id, $event_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT * FROM UserEvents WHERE UserEvents.idEvent = :idEvent AND UserEvents.idUser = :idUser');
-        $stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);    
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll() != false;
-    }
+	function users_listAllEvents($user_id, $private) {
 
-    function users_wasInvited($user_id, $event_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT * FROM Invites WHERE Invites.idEvent = :idEvent AND Invites.idUser = :idUser');
-        $stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);    
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll() != false;
-    }
+		global $db;
 
-    function users_listInvite($user_id, $event_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT Invites.idSender FROM Invites WHERE Invites.idEvent = :idEvent AND Invites.idUser = :idUser');
-        $stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);    
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetch();
-    }
+		if ($private) {
+			$stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events
+				ON UserEvents.idUser = :idOwner
+				AND Events.idEvent = UserEvents.idEvent
+				AND Users.idUser = UserEvents.idUser');
+		}
+		else {
+			$stmt = $db->prepare('SELECT DISTINCT Events.* FROM UserEvents JOIN Users, Events
+				ON UserEvents.idUser = :idOwner
+				AND Events.idEvent = UserEvents.idEvent
+				AND Users.idUser = UserEvents.idUser
+				AND (Events.private = 0
+				OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
+			$stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
+		}
 
-    function users_listFutureEvents($user_id, $current_date) {
-        global $db;
-        $stmt = $db->prepare('SELECT Events.* FROM UserEvents JOIN Users, Events 
-                ON UserEvents.idUser = :idUser
-                AND Events.idEvent = UserEvents.idEvent
-                AND Users.idUser = UserEvents.idUser
-                WHERE Events.date > :currentDate');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->bindParam(':currentDate', $current_date, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+		$stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
 
-    function users_countInvites($user_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT COUNT(*) AS count FROM Invites 
-                INNER JOIN Users 
-                ON Invites.idUser = :idUser
-                AND Users.idUser = Invites.idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
+	function users_listOwnEvents($user_id, $private) {
+		global $db;
 
-        if (count($result) > 0) {
-             return $result[0]['count'];
-        }
-       
-       return 0;
-    }
+		if ($private) {
+			$stmt = $db->prepare('SELECT DISTINCT * FROM Events WHERE idUser = :idOwner');
+		}
+		else {
+			 $stmt = $db->prepare('SELECT DISTINCT Events.* FROM Events
+				JOIN UserEvents ON Events.idUser = :idOwner
+				AND UserEvents.idEvent = Events.idEvent
+				AND (Events.private = 0 OR (Events.private = 1 AND UserEvents.idUser = :idUser))');
+			 $stmt->bindParam(':idUser', $thisUser, PDO::PARAM_INT);
+		}
 
-    function users_listInvites($user_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT Events.*, Invites.idSender FROM Invites
-            INNER JOIN Users, Events
-            ON Events.idEvent = Invites.idEvent
-            AND Invites.idUser = :idUser
-            AND Users.idUser = Invites.idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+		$stmt->bindParam(':idOwner', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
 
-    function users_usernameExists($username) {   
-        global $db;
-        $stmt = $db->prepare('SELECT username FROM Users WHERE username = :username');
-        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $stmt->execute();
-        $result = $stmt->fetchAll();    
-        return $result != false && is_array($result) && count($result) > 0;
-    }
+	function users_isParticipating($user_id, $event_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT * FROM UserEvents WHERE UserEvents.idEvent = :idEvent AND UserEvents.idUser = :idUser');
+		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll() != false;
+	}
 
-    function users_idExists($user_id) {
-        global $db;
-        $stmt = $db->prepare('SELECT username FROM Users WHERE idUser = :idUser');
-        $stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetchAll();    
-        return $result != false && is_array($result) && count($result) > 0;
-    }
+	function users_wasInvited($user_id, $event_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT * FROM Invites WHERE Invites.idEvent = :idEvent AND Invites.idUser = :idUser');
+		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll() != false;
+	}
 
-    function users_emailExists($email) {
-        global $db;
-        $stmt = $db->prepare('SELECT email FROM Users WHERE email = :email');
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-        return $result != false && is_array($result) && count($result) > 0;
-    }
+	function users_listInvite($user_id, $event_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT Invites.idSender FROM Invites WHERE Invites.idEvent = :idEvent AND Invites.idUser = :idUser');
+		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch();
+	}
 
-    function validateLogin($username, $password) {
-       
-        global $db;
-        $stmt = $db->prepare('SELECT * FROM Users WHERE username = :username');
-        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $stmt->execute();
-        $queryResult = $stmt->fetchAll();
+	function users_listFutureEvents($user_id, $current_date) {
+		global $db;
+		$stmt = $db->prepare('SELECT Events.* FROM UserEvents JOIN Users, Events
+				ON UserEvents.idUser = :idUser
+				AND Events.idEvent = UserEvents.idEvent
+				AND Users.idUser = UserEvents.idUser
+				WHERE Events.date > :currentDate');
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->bindParam(':currentDate', $current_date, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
 
-        if ($queryResult != false && count($queryResult) > 0) {
-            $correctHash = $queryResult[0]['password'];
-            $validateResult = validate_password($password, $correctHash); 
-            return $queryResult[0]['idUser'];
-        }
+	function users_countInvites($user_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT COUNT(*) AS count FROM Invites
+				INNER JOIN Users
+				ON Invites.idUser = :idUser
+				AND Users.idUser = Invites.idUser');
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
 
-        return 0;
-    }
+		if (count($result) > 0) {
+			 return $result[0]['count'];
+		}
+
+	   return 0;
+	}
+
+	function users_listInvites($user_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT Events.*, Invites.idSender FROM Invites
+			INNER JOIN Users, Events
+			ON Events.idEvent = Invites.idEvent
+			AND Invites.idUser = :idUser
+			AND Users.idUser = Invites.idUser');
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	function users_usernameExists($username) {
+		global $db;
+		$stmt = $db->prepare('SELECT username FROM Users WHERE username = :username');
+		$stmt->bindParam(':username', $username, PDO::PARAM_STR);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result != false && is_array($result) && count($result) > 0;
+	}
+
+	function users_idExists($user_id) {
+		global $db;
+		$stmt = $db->prepare('SELECT username FROM Users WHERE idUser = :idUser');
+		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result != false && is_array($result) && count($result) > 0;
+	}
+
+	function users_emailExists($email) {
+		global $db;
+		$stmt = $db->prepare('SELECT email FROM Users WHERE email = :email');
+		$stmt->bindParam(':email', $email, PDO::PARAM_STR);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result != false && is_array($result) && count($result) > 0;
+	}
+
+	function validateLogin($username, $password) {
+
+		global $db;
+		$stmt = $db->prepare('SELECT * FROM Users WHERE username = :username');
+		$stmt->bindParam(':username', $username, PDO::PARAM_STR);
+		$stmt->execute();
+		$queryResult = $stmt->fetchAll();
+
+		if ($queryResult != false && count($queryResult) > 0) {
+			$correctHash = $queryResult[0]['password'];
+			$validateResult = validate_password($password, $correctHash);
+			return $queryResult[0]['idUser'];
+		}
+
+		return 0;
+	}
 ?>

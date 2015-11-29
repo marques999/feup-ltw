@@ -295,7 +295,7 @@ nav.fixed-header {
 	position: fixed;
 	left:0;
 	top: 0;
-	width: 100%; 
+	width: 100%;
 	z-index: 1;
 }
 
@@ -305,7 +305,7 @@ a.red {
 
 a.red:hover {
 	color: #aa0000;
-	text-decoration: underline;	
+	text-decoration: underline;
 }
 
 /*********************/
@@ -361,6 +361,11 @@ figure.ink-image > figcaption {
 	margin: 0 auto;
 	position: relative;
 	overflow: hidden;
+}
+
+.center {
+	margin: 0 auto;
+	position: relative;
 }
 
 .ink-alert.block {

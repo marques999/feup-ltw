@@ -10,7 +10,7 @@
 		$userExists = users_idExists($thisAuthor);
 		$currentTime = time();
 
-		if ($userExists) {		
+		if ($userExists) {
 			$safeTitle = strip_tags_content($_POST['title']);
 			$safeMessage = strip_tags_content($_POST['message']);
 			$stmt = $db->prepare('INSERT INTO ForumPost VALUES(NULL, :idUser, :title, 0, :message, :timestamp)');
@@ -20,7 +20,7 @@
 			$stmt->bindParam(':timestamp', $currentTime, PDO::PARAM_INT);
 
 			if ($stmt->execute()) {
-				header("Location: ../view_thread.php?id={$thisThread}#comments");		
+				header("Location: ../view_thread.php?id={$thisThread}#comments");
 			}
 			else {
 				header("../database_error.php");

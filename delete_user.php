@@ -4,26 +4,19 @@
 	include_once('database/users.php');
 	include('template/header.php');
 
-	$userId = 0;
-	$sameUser = false;
+	$userId=0;
+	$sameUser=false;
 
-	if (isset($_GET['id']) && $loggedIn) {
-		$userId = intval($_GET['id']);
-		$userExists = users_idExists($userId);
-
-		if ($userExists) {
-			$sameUser = ($userId == $thisUser);
+	if(isset($_GET['id'])&&$loggedIn){
+		$userId=intval($_GET['id']);
+		$userExists=users_idExists($userId);
+		if($userExists){
+			$sameUser=($userId==$thisUser);
 		}
 	}
 ?>
 
-<script>
-	$(document).ready(function() {
-		$('#nav_events').addClass('active');
-	});
-</script>
-
-<div class="ink-grid all-45 large-60 medium-80 small-100 tiny-100">
+<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 <?if($loggedIn){?>
 	<?if($sameUser){?>
 	<div class="column all-100 ink-alert block info">
