@@ -67,8 +67,7 @@ function slow_equals($a, $b) {
 
 	$diff = strlen($a) ^ strlen($b);
 
-	for($i = 0; $i < strlen($a) && $i < strlen($b); $i++)
-	{
+	for($i = 0; $i < strlen($a) && $i < strlen($b); $i++) {
 		$diff |= ord($a[$i]) ^ ord($b[$i]);
 	}
 
@@ -79,11 +78,11 @@ function pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output =
 
 	$algorithm = strtolower($algorithm);
 
-	if(!in_array($algorithm, hash_algos(), true)) {
+	if (!in_array($algorithm, hash_algos(), true)) {
 		trigger_error('PBKDF2 ERROR: Invalid hash algorithm.', E_USER_ERROR);
 	}
 
-	if($count <= 0 || $key_length <= 0) {
+	if ($count <= 0 || $key_length <= 0) {
 		trigger_error('PBKDF2 ERROR: Invalid parameters.', E_USER_ERROR);
 	}
 
@@ -100,7 +99,7 @@ function pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output =
 	$block_count = ceil($key_length / $hash_length);
 	$output = "";
 
-	for($i = 1; $i <= $block_count; $i++) {
+	for ($i = 1; $i <= $block_count; $i++) {
 
 		$last = $salt . pack("N", $i);
 		$last = $xorsum = hash_hmac($algorithm, $last, $password, true);
@@ -112,7 +111,7 @@ function pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output =
 		$output .= $xorsum;
 	}
 
-	if($raw_output) {
+	if ($raw_output) {
 	   return substr($output, 0, $key_length);
 	}
 

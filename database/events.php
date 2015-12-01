@@ -68,13 +68,7 @@
 	function events_getName($eventData) {
 
 		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
-			$userData = $defaultUser;
-		}
-
-		$event_id = intval($eventData['idEvent']);
-
-		if (!intval($event_id)) {
-			$event_id = 0;
+			$eventData = $defaultUser;
 		}
 
 		if (isset($eventData['private']) && intval($eventData['private']) == 1) {
@@ -82,6 +76,35 @@
 		}
 
 		return $eventData['name'];
+	}
+
+	function events_getDate($eventData) {
+
+		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+			$eventData = $defaultEvent;
+		}
+		
+		return gmdate("l, d/m/Y H:i", $eventData['date']);
+	}
+
+	function events_getImage($eventData, $imageSize) {
+
+		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
+			$eventData = $defaultEvent;
+		}
+
+		$event_id = safe_getId($eventData, 'idEvent');
+
+		//return glob("img/events/$event_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
+		if ($imageSize == 'small') {
+			return "holder.js/200x100/auto/ink";
+		}
+
+		if ($imageSize == 'medium') {
+			return "holder.js/400x256/auto/ink";
+		}
+
+		return "holder.js/1200x580/auto/ink";
 	}
 
 	function events_listParticipants($event_id) {
@@ -115,8 +138,8 @@
 		global $db;
 		global $defaultEvent;
 		$stmt = $db->prepare('SELECT Events.idEvent, COUNT(Invites.idEvent) AS count FROM Events
-								LEFT JOIN Invites ON Invites.idEvent = Events.idEvent
-								GROUP BY Events.idEvent');
+				LEFT JOIN Invites ON Invites.idEvent = Events.idEvent
+				GROUP BY Events.idEvent');
 		$stmt->execute();
 		$eventList = array();
 		$eventList[0] = $defaultEvent;
@@ -144,13 +167,14 @@
 	}
 
 	function events_listTopEvents($top_n) {
-
 		global $db;
-		$stmt = $db->prepare('SELECT Events.*, COUNT(*) FROM Events, UserEvents
-								WHERE Events.idEvent = UserEvents.idEvent
-								AND private = 0
-								GROUP BY UserEvents.idEvent
-								LIMIT :topResults');
+		$stmt = $db->prepare('SELECT Events.*, COUNT(UserEvents.idUser) AS participants 
+			FROM Events, UserEvents
+			WHERE Events.idEvent = UserEvents.idEvent
+			AND private = 0
+			GROUP BY UserEvents.idEvent
+			ORDER BY participants DESC
+			LIMIT :topResults');
 		$stmt->bindParam(':topResults', $top_n, PDO::PARAM_INT);
 		$stmt->execute();
 		return $stmt->fetchAll();

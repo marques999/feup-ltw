@@ -459,17 +459,9 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             this._errorParagraph = paragraph;
         },
 
-        /**
-         * Validates the element based on the rules defined.
-         * It parses the rules defined in the _options.rules property.
-         *
-         * @method validate
-         * @return {Boolean} True if every rule was valid. False if one fails.
-         * @public
-         */
+
         validate: function(){
             if (this._forceValid) {
-                /* The user says it's valid */
                 this._errors = {};
                 return true;
             }
@@ -499,8 +491,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
 
             this._parseRules( this._options.rules );
 
-            // We want to validate this field only if it's not empty
-            // "" is not an invalid number.
             var doValidate = this.getValue() !== '' ||
                 // If it's required it will be validated anyway.
                 ("required" in this._rules) ||
@@ -584,38 +574,11 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
 
     FormValidator.prototype = {
         _init: function(){
-            /**
-             * Element of the form being validated
-             *
-             * @property _rootElement
-             * @type {Element}
-             */
             this._rootElement = this._element;
-
-            /**
-             * Object that will gather the form elements by name
-             *
-             * @property _formElements
-             * @type {Object}
-             */
             this._formElements = {};
-
-            /**
-             * Error message Elements
-             * 
-             * @property _errorMessages
-             */
             this._errorMessages = [];
-
-            /**
-             * Array of FormElements marked with validation errors
-             *
-             * @property _markedErrorElements
-             */
             this._markedErrorElements = [];
 
-            // Sets an event listener for a specific event in the form, if defined.
-            // By default is the 'submit' event.
             if( typeof this._options.eventTrigger === 'string' ){
                 Event.observe(
                     this._rootElement,
@@ -628,16 +591,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             }
         },
 
-        /**
-         * Searches for the elements in the form.
-         * This method is based in the this._options.searchFor configuration.
-         *
-         * Returns an object mapping names of object to arrays of FormElement instances.
-         *
-         * @method getElements
-         * @return {Object} An object with the elements in the form, indexed by name/id
-         * @public
-         */
         getElements: function(){
             if (!this._formElements) {
                 this._formElements = {};
@@ -662,7 +615,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
 
             for(i=0; i<formElements.length; i+=1 ){
                 var element = formElements[i];
-
                 var dataAttrs = Element.data( element );
 
                 if( !("rules" in dataAttrs) ){
@@ -709,11 +661,6 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             return new FormElement(element, options);
         },
 
-        /**
-         * Set my I18n instance with the validation messages.
-         * @method setI18n
-         * @param {Ink.Util.I18n_1} i18n I18n instance
-         **/
         setI18n: function (i18n) {
             if (i18n.clone) {
                 // New function, added safety
@@ -722,23 +669,10 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             this.i18n = i18n;
         },
 
-        /**
-         * Get my I18n instance with the validation messages.
-         * @method getI18n
-         * @return {Ink.Util.I18n_1} I18n instance
-         **/
         getI18n: function () {
             return this.i18n || validationMessages;
         },
 
-        /**
-         * Set the language of this form validator to the given language code
-         * If we don't have an i18n instance, create one which is a copy of the global one.
-         * @method setLanguage
-         * @param {String} language Language code (ex: en_US, pt_PT)
-         * @return {void}
-         * @public
-         **/
         setLanguage: function (language) {
             if (!this.i18n) {
                 this.setI18n(validationMessages);
@@ -746,28 +680,10 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
             this.i18n.lang(language);
         },
 
-        /**
-         * Gets the language code string (pt_PT or en_US for example) currently in use by this formvalidator.
-         * May be global
-         *
-         * @method getLanguage
-         * @public
-         * @return {String} Language code.
-         **/
         getLanguage: function () {
             return this.i18n ? this.i18n.lang() : validationMessages.lang();
         },
 
-        /**
-         * Validates every registered FormElement 
-         * This method looks inside the this._formElements object for validation targets.
-         * Also, based on the this._options.beforeValidation, this._options.onError, and this._options.onSuccess, this callbacks are executed when defined.
-         *
-         * @method validate
-         * @param  {Event} event    Window.event object
-         * @return {Boolean} Whether the form is considered valid
-         * @public
-         */
         validate: function( event ) {
 
             if(this._options.neverSubmit && event) {
@@ -844,10 +760,8 @@ Ink.createModule('Ink.UI.FormValidator', '2', [ 'Ink.UI.Common_1','Ink.Dom.Eleme
     };
 
     Common.createUIComponent(FormValidator);
-
     FormValidator.FormElement = FormElement;  // Export FormElement too, for testing.
     FormValidator.validationFunctions = validationFunctions;  // Export the raw validation functions too, for fiddling.
 
     return FormValidator;
-
 });

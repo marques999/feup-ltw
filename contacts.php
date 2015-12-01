@@ -3,7 +3,7 @@
 	include_once('database/users.php');
 	include('template/header.php');
 ?>
-<section class="column-group gutters article">
+<div class="column-group gutters article">
 <div class="xlarge-20 large-20 medium-10 small-5 tiny-5">
 </div>
 <div class="xlarge-60 large-60 medium-80 small-90 tiny-90">
@@ -14,7 +14,8 @@
 	<h5 class="slab half-top-space">Mestrado Integrado em Engenharia Informática e Computação</h5>
 </div>
 <h2 class="slab">Group</h2>
-<div class="level2">
+<div class="column level2">
+	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
 	<h4 class="slab">Carlos Samouco</h4>
 	<span>
 		<i class="fa fa-envelope"></i>
@@ -22,7 +23,8 @@
 	</span>
 	<p>The list of groups will be published shortly</p>
 </div>
-<div class="level2">
+<div class="column level2">
+	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
 	<h4 class="slab">Diana Pinto</h4>
 	<span>
 		<i class="fa fa-envelope"></i>
@@ -30,7 +32,8 @@
 	</span>
 	<p>The list of groups will be published shortly</p>
 </div>
-<div class="level2">
+<div class="column level2">
+	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
 	<h4 class="slab">Diogo Marques</h4>
 	<span>
 		<i class="fa fa-envelope"></i>
@@ -39,7 +42,7 @@
 	<p>The list of groups will be published shortly</p>
 </div>
 </div>
-</section>
+</div>
 <?
 	include('template/footer.php');
 ?>

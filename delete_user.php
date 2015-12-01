@@ -1,7 +1,7 @@
 <?
 	include_once('database/connection.php');
-	include_once('database/session.php');
 	include_once('database/users.php');
+	include_once('database/session.php');
 	include('template/header.php');
 
 	$userId=0;
@@ -16,40 +16,40 @@
 	}
 ?>
 
-<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
+<script>
+$(function(){
+	$('#nav_profile').addClass('active');
+});
+</script>
+
 <?if($loggedIn){?>
 	<?if($sameUser){?>
-	<div class="column all-100 ink-alert block info">
-		<h4>Delete Account</h4>
-		<p>Are you sure you want to delete your <strong>user account</strong>?</p>
-		<p>You will be signed out automatically...</p>
-		<form action="actions/action_delete_event.php" class="ink-form">
-		<div class="control-group column-group half-gutters">
-			<div class="control all-100 align-center">
-				<span class="align-center">
-					<input type="submit" name="result" value="Yes" class="ink-button all-20"/>
-					<input type="reset" name="result" value="No" class="ink-button all-20"/>
-				</span>
-			</div>
+	<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
+		<div class="column all-100 ink-alert block error">
+			<h4>Delete Account</h4>
+			<p>Are you sure you want to delete your user account <strong><?=$_SESSION['username']?></strong>?</p>
+			<p><strong>WARNING: </strong>All your events, comments and forum posts will be deleted automatically and you will be signed out shortly after...</p>
+			<form action="actions/action_delete_user.php" method="post" class="ink-form">
+				<input type="hidden" name="idUser" value="<?=$userId?>"/>
+				<p class="all-100 align-center">
+					<button type="submit" class="ink-button">Yes</button>
+					<button type="reset" class="ink-button" onclick="history.go(-1)">No</button>
+				</p>
+			</form>
 		</div>
-		</form>
 	</div>
 	<?}else{?>
-	<div class="column ink-alert block error">
-		<h4>Forbidden</h4>
-		<p>You don't have permission to access this page!</p>
-		<p>Are you trying to delete accounts from other users?</p>
+	<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
+		<div class="column ink-alert block error">
+			<h4>Forbidden</h4>
+			<p>You don't have permission to access this page!</p>
+			<p>Are you trying to delete accounts from other users?</p>
+		</div>
 	</div>
 	<?}?>
-<?}else{?>
-<div class="column ink-alert block error">
-	<h4>Forbidden</h4>
-	<p>You don't have permission to access this page!</p>
-	<p>Please <a href="login.php">log in</a> with your account first.</p>
-</div>
-<?}?>
-</div>
-
+<?}else{
+	include_once('message_guest.php');
+}?>
 <?
 	include('template/footer.php');
 ?>

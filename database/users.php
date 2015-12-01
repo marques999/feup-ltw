@@ -10,12 +10,11 @@
 	$stmt = $db->prepare('SELECT idUser, username FROM Users');
 	$stmt->execute();
 	$allUsers = array();
+	$allUsers[0] = $defaultUser;
 
 	while(($result = $stmt->fetch()) != null) {
 		$allUsers[$result['idUser']] = $result;
 	}
-
-	$allUsers[0] = $defaultUser;
 
 	function users_listById($user_id) {
 		global $db;
@@ -30,11 +29,9 @@
 		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Users'");
 		$stmt->execute();
 		$result = $stmt->fetch();
-
 		if ($result != false && is_array($result)) {
 			return $result['seq'];
 		}
-
 		return -1;
 	}
 
@@ -69,12 +66,7 @@
 			$userData = $defaultUser;
 		}
 
-		$user_id = intval($userData['idUser']);
-
-		if (!intval($user_id)) {
-			$user_id = 0;
-		}
-
+		$user_id = safe_getId($userData, 'idUser');
 		return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
 	}
 
@@ -105,11 +97,9 @@
 		$stmt = $db->prepare('SELECT COUNT(*) AS count FROM Users');
 		$stmt->execute();
 		$result = $stmt->fetchAll();
-
 		if ($result != false && is_array($result) && count($result) > 0) {
 			 return $result[0]['count'];
 		}
-
 		return 0;
 	}
 
@@ -199,28 +189,25 @@
 
 	function users_countInvites($user_id) {
 		global $db;
-		$stmt = $db->prepare('SELECT COUNT(*) AS count FROM Invites
+		$stmt = $db->prepare('SELECT COUNT(Invites.idEvent) AS count FROM Invites
 				INNER JOIN Users
 				ON Invites.idUser = :idUser
 				AND Users.idUser = Invites.idUser');
 		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
 		$stmt->execute();
 		$result = $stmt->fetchAll();
-
-		if (count($result) > 0) {
+		if (is_array($result) && count($result) > 0) {
 			 return $result[0]['count'];
 		}
-
-	   return 0;
+		return 0;
 	}
 
 	function users_listInvites($user_id) {
 		global $db;
 		$stmt = $db->prepare('SELECT Events.*, Invites.idSender FROM Invites
-			INNER JOIN Users, Events
+			INNER JOIN Events
 			ON Events.idEvent = Invites.idEvent
-			AND Invites.idUser = :idUser
-			AND Users.idUser = Invites.idUser');
+			AND Invites.idUser = :idUser');
 		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
 		$stmt->execute();
 		return $stmt->fetchAll();
@@ -254,19 +241,19 @@
 	}
 
 	function validateLogin($username, $password) {
-
 		global $db;
+		$safeUsername=strip_tags_content($username);
 		$stmt = $db->prepare('SELECT * FROM Users WHERE username = :username');
-		$stmt->bindParam(':username', $username, PDO::PARAM_STR);
+		$stmt->bindParam(':username', $safeUsername, PDO::PARAM_STR);
 		$stmt->execute();
-		$queryResult = $stmt->fetchAll();
-
-		if ($queryResult != false && count($queryResult) > 0) {
-			$correctHash = $queryResult[0]['password'];
-			$validateResult = validate_password($password, $correctHash);
-			return $queryResult[0]['idUser'];
+		$result = $stmt->fetchAll();
+		if ($result != false && is_array($result) && count($result) > 0) {
+			$result = $result[0];
+			$correctHash = $result['password'];
+			if(validate_password($password, $correctHash)){
+				return $result['idUser'];
+			}
 		}
-
 		return 0;
 	}
 ?>

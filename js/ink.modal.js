@@ -1,8 +1,3 @@
-/**
- * Modal dialog prompts
- * @module Ink.UI.Modal_1
- * @version 1
- */
 Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.Dom.Css_1','Ink.Dom.Element_1','Ink.Dom.Selector_1','Ink.Util.Array_1'], function(Common, Event, Css, InkElement, Selector, InkArray ) {
     'use strict';
 
@@ -12,9 +7,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
     }(InkElement.create('div', {style: 'opacity: 1'})));
 
     var vhVwSupported = (function (elem) {
-        // Stolen with pride from modernizr:
-        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/vhunit.js
-        // and https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/vwunit.js
         var height = parseInt(window.innerHeight / 2, 10);
         var compHeight = parseInt((window.getComputedStyle ?
                                   getComputedStyle(elem, null) :
@@ -59,29 +51,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
         return theDefault;
     };
 
-    /**
-     * @class Ink.UI.Modal
-     * @constructor
-     * @version 1
-     * @param {String|Element}      selector                        Element or ID
-     * @param {Object}              [options]                       Options object, containing:
-     * @param {String}              [options.width]                 Default/Initial width. Ex: '600px'
-     * @param {String}              [options.height]                Default/Initial height. Ex: '400px'
-     * @param {String}              [options.shadeClass]            Custom class to be added to the div.ink-shade
-     * @param {String}              [options.modalClass]            Custom class to be added to the div.ink-modal
-     * @param {String}              [options.trigger]               CSS Selector for target elements that will trigger the Modal.
-     * @param {Boolean}             [options.autoDisplay]           Displays the Modal automatically when constructed.
-     * @param {String}              [options.markup]                Markup to be placed in the Modal when created
-     * @param {Function}            [options.onShow]                Callback function to run when the Modal is opened.
-     * @param {Function}            [options.onDismiss]             Callback function to run when the Modal is closed. Return `false` to cancel dismissing the Modal.
-     * @param {Boolean}             [options.closeOnClick]          Flag to close the modal when clicking outside of it.
-     * @param {Boolean}             [options.closeOnEscape]         Determines if the Modal should close when "Esc" key is pressed. Defaults to true.
-     * @param {Boolean}             [options.responsive]            Determines if the Modal should behave responsively (adapt to smaller viewports).
-     * @param {String}              [options.triggerEvent]          (advanced) Trigger's event to be listened. Defaults to 'click'.
-     *
-     * @sample Ink_UI_Modal_1.html
-     */
-
     var openModals = [];
 
     function Modal() {
@@ -91,28 +60,13 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
     Modal._name = 'Modal_1';
 
     Modal._optionDefinition = {
-        /**
-         * Width, height and markup really optional, as they can be obtained by the element
-         */
         width:        ['String', '90%'],
         height:       ['String', '90%'],
-
-        /**
-         * To add extra classes
-         */
         shadeClass:   ['String', undefined],
         modalClass:   ['String', undefined],
-
-        /**
-         * Optional trigger properties
-         */
         trigger:      ['String', undefined],
         triggerEvent: ['String', 'click'],
         autoDisplay:  ['Boolean', true],
-
-        /**
-         * Remaining options
-         */
         markup:       ['String', undefined],
         onShow:       ['Function', undefined],
         onDismiss:    ['Function', undefined],
@@ -289,12 +243,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             }
         },
 
-        /**
-         * Responsible for resizing the modal when the window's size changes.
-         * 
-         * @method _onResize
-         * @private
-         */
         _onResize: function( ){
             var dimensionsAreVariant = this._dimensionIsVariant.height || this._dimensionIsVariant.width;
             var dimensionIsPercentage = this._dimensionIsPercentage();
@@ -317,13 +265,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             }
         },
 
-        /**
-         * Handle clicks on the shade element.
-         * 
-         * @method _onShadeClick
-         * @param {Event} ev DOM click event
-         * @private
-         */
         _onShadeClick: function(ev) {
             if (!this._isOpen) { return; }
 
@@ -331,7 +272,8 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
 
             if (tgtEl === this._modalShadow && this._options.closeOnClick) {
                 this.dismiss();
-            } else if (Css.hasClassName(tgtEl, 'ink-close') || Css.hasClassName(tgtEl, 'ink-dismiss') || 
+            }
+            else if (Css.hasClassName(tgtEl, 'ink-close') || Css.hasClassName(tgtEl, 'ink-dismiss') || 
                 InkElement.findUpwardsBySelector(tgtEl, '.ink-close,.ink-dismiss') ||
                 (
                     this._options.closeOnClick &&
@@ -355,13 +297,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             }
         },
 
-        /**
-         * Responsible for handling the escape key pressing.
-         *
-         * @method _onKeyDown
-         * @param  {Event} ev
-         * @private
-         */
         _onKeyDown: function(ev) {
             if (ev.keyCode !== 27 || !this._isOpen) { return; }
             if (this._options.closeOnEscape &&
@@ -375,20 +310,20 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
 
         _resize: function () {
             var dims = this._getDimensions();
-
             this._modalDiv.style.width = dims.width;
             this._modalDiv.style.height = dims.height;
         },
 
         _resizeContainer: function() {
             var containerHeight = InkElement.elementHeight(this._modalDiv);
-
             this._modalHeader = Selector.select('.modal-header',this._modalDiv)[0];
+           
             if( this._modalHeader ){
                 containerHeight -= InkElement.elementHeight(this._modalHeader);
             }
 
             this._modalFooter = Selector.select('.modal-footer',this._modalDiv)[0];
+            
             if( this._modalFooter ){
                 containerHeight -= InkElement.elementHeight(this._modalFooter);
             }
@@ -438,19 +373,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             }
         },
 
-        /**************
-         * PUBLIC API *
-         **************/
-
-        /**
-         * Opens this Modal. 
-         * Use this if you created the modal with `autoDisplay: false`
-         * to open the modal when you want to.
-         * @method open 
-         * @param {Event} [event] (internal) In case its fired by the internal trigger.
-         * @return {void}
-         * @public
-         */
         open: function(event) {
             /* jshint -W030 */
 
@@ -459,8 +381,8 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             if( event ){ Event.stopDefault(event); }
 
             Css.addClassName( this._modalShadow,'ink-shade' );
+           
             this._modalShadow.style.display = this._modalDiv.style.display = 'block';
-
             this._modalShadow.offsetHeight;  // Cause a reflow
 
             Css.addClassName( this._modalShadow, 'visible' );
@@ -473,41 +395,25 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             this._shadeElement   = this._modalShadow;
 
             if( !this._markupMode ){
-                /**
-                 * Setting the content of the modal
-                 */
                 this.setContentMarkup( this._options.markup );
             }
 
-            /**
-             * If any size has been user-defined, let's set them as max-width and max-height
-             */
-
             this._resize();
-
-            // /**
-            //  * Let's resize, place it:
-            //  */
             this._avoidModalLargerThanScreen();
             this._reposition();
+
             if (!flexSupported) {
                 this._resizeContainer();
-            } else {
+            }
+            else {
                 this._resizeContainerFlex();
             }
 
-            // /**
-            //  * Responsive modals (they're responsive by default) will resize as the viewport resizes.
-            //  * They need a resize handler if we're an old browser or they're not percentage-based
-            //  * (because pixel-size-based iframes become larger than the viewport at some point).
-            //  **/
             if( this._options.responsive ) {
                 var isPercentage = this._dimensionIsPercentage();
-
                 var needResizeHandler = !(
                     vhVwSupported &&
                     flexSupported &&
-                    //Css.getStyle(this._modalDiv, 'display') !== 'block' &&
                     isPercentage.height &&
                     isPercentage.width &&
                     !this._dimensionIsVariant.height &&
@@ -531,37 +437,25 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
                 });
             }
 
-            // // subscribe events
             Event.observe(this._shadeElement, 'click', this._handlers.click);
             if (this._options.closeOnEscape ) {
                 Event.observe(document, 'keydown', this._handlers.keyDown);
             }
 
             this._isOpen = true;
-            openModals.push(this);
 
+            openModals.push(this);
             Css.addClassName(document.documentElement, 'ink-modal-open');
         },
 
-        /**
-         * Returns whether the modal is currently open.
-         * @method isOpen
-         * @return {Boolean} Whether the modal is open right now.
-         * @public
-         **/
         isOpen: function () {
             return this._isOpen;
         },
 
-        /**
-         * Closes the modal.
-         * 
-         * @method dismiss
-         * @return {void}
-         * @public
-         */
         dismiss: function() {
-            if (!this._isOpen) { /* Already dismissed. WTF IE. */ return; }
+            if (!this._isOpen) {
+                return; 
+            }
 
             if (this._options.onDismiss) {
                 var ret = this._options.onDismiss(this);
@@ -573,8 +467,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             if( this._handlers.resize ){
                 Event.stopObserving(window, 'resize', this._handlers.resize);
             }
-
-            // this._modalShadow.parentNode.removeChild(this._modalShadow);
 
             if( !this._markupMode ){
                 this._modalShadow.parentNode.removeChild(this._modalShadow);
@@ -598,11 +490,6 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             }
         },
 
-        /**
-         * Utility function to listen to the onTransmissionEnd event, or wait using setTimeouts
-         *
-         * Specific to this._element
-         */
         _waitForFade: function (elem, callback) {
             if (!opacitySupported) { return callback(); }
 
@@ -619,58 +506,22 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
             setTimeout(fadeChecker, 500);
         },
 
-        /**
-         * Removes the modal from the DOM
-         * 
-         * @method destroy
-         * @return {void}
-         * @public
-         */
         destroy: function() {
             Common.unregisterInstance(this._instanceId);
         },
 
-        /**
-         * Returns the content DOM element
-         * 
-         * @method getContentElement
-         * @return {Element} Modal main cointainer.
-         * @public
-         */
         getContentElement: function() {
             return this._contentContainer || null;
         },
 
-        /**
-         * Returns the modal element
-         *
-         * @method getModalElement
-         * @return {Element} Modal element
-         * @public
-         */
         getModalElement: function () {
             return this._modalDiv || null;
         },
 
-        /**
-         * Returns the modal shade (the page-covering dark shade element)
-         *
-         * @method getShadeElement
-         * @return {Element} Modal shade
-         * @public
-         */
         getShadeElement: function () {
             return this._modalShadow || null;
         },
 
-        /**
-         * Replaces the content markup
-         * 
-         * @method setContentMarkup
-         * @param {String} contentMarkup Markup to be placed inside the modal.
-         * @return {void}
-         * @public
-         */
         setContentMarkup: function(contentMarkup) {
             if( !this._markupMode ){
                 this._modalDiv.innerHTML = [contentMarkup].join('');
@@ -703,10 +554,8 @@ Ink.createModule('Ink.UI.Modal', '1', ['Ink.UI.Common_1','Ink.Dom.Event_1','Ink.
     };
 
     Common.createUIComponent(Modal, { elementIsOptional: true });
-
     Modal._vhVwSupported = vhVwSupported;
     Modal._flexSupported = flexSupported;
 
     return Modal;
-
 });

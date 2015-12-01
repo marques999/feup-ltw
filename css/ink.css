@@ -2311,37 +2311,25 @@ table.ink-table tbody > tr.red td {
   color: white;
 }
 
-.ink-carousel {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  display: block;
-}
-
-.ink-carousel .stage {
+.stage {
   width: 100%;
   left: 0;
   height: auto !important;
   margin-top: 0;
   margin-bottom: 0;
+  overflow: hidden;
   padding-left: 0;
   list-style-type: none;
   white-space: nowrap;
   position: relative;
-  -webkit-transition: left 0.5s ease;
-  -moz-transition: left 0.5s ease;
-  -o-transition: left 0.5s ease;
-  transition: left 0.5s ease;
 }
 
-.ink-carousel .stage .slide {
+.slide {
   position: relative;
   display: inline-block;
-  vertical-align: top;
   white-space: normal;
   margin: 0;
   float: none;
-  *display: inline;
 }
 
 .ink-datepicker-wrapper {

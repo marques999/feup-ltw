@@ -1,12 +1,13 @@
 <?
 	include_once('../database/action.php');
 	include_once('../database/forum.php');
+	include_once('../database/session.php');
 	include_once('../database/tags.php');
 	include_once('../database/users.php');
 
 	if (isset($_POST['idUser']) && isset($_POST['idThread'])) {
-		$thisThread = intval($_POST['idThread']);
-		$thisParticipant = intval($_POST['idUser']);
+		$thisThread = safe_getId($_POST, 'idThread');
+		$thisParticipant = safe_getId($_POST, 'idUser');
 		$userExists = users_idExists($thisParticipant);
 		$isQuote = false;
 		$currentTime = time();
@@ -33,20 +34,22 @@
 			$stmt->bindParam(':timestamp', $currentTime, PDO::PARAM_INT);
 
 			if ($stmt->execute()) {
-				header("Location: ../view_thread.php?id={$thisThread}#comments");
+				header("Location: ../view_thread.php?id={$thisThread}#last");
 			}
 			else {
-				header("../database_error.php");
+				header("Location: ../database_error.php");
 			}
 		}
 	}
-
-	if (isset($_SERVER['HTTP_REFERER'])) {
-		$refererUrl = $_SERVER['HTTP_REFERER'];
-	}
 	else {
-		$refererUrl = 'index.php';
-	}
 
-	header("Location: $refererUrl");
+		if (isset($_SERVER['HTTP_REFERER'])) {
+			$refererUrl = $_SERVER['HTTP_REFERER'];
+		}
+		else {
+			$refererUrl = '../forum.php';
+		}
+
+		header("Location: $refererUrl");
+	}
 ?>

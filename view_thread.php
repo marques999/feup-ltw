@@ -1,34 +1,38 @@
 <?
 	include_once('database/connection.php');
+	include_once('database/emoticons.php');
 	include_once('database/forum.php');
 	include_once('database/users.php');
 	include('template/header.php');
 
+	$threadId=0;
+	$validReference=false;
+
 	if(isset($_GET['id'])){
-
-		$threadId=intval($_GET['id']);
-
-		if($threadId<0){
-			$threadId=0;
-		}
-
+		$threadId=safe_getId($_GET, 'id');
 		$thisThread=thread_listById($threadId);
-		$thisPosts=thread_listPosts($threadId);
-
+		
 		if(count($thisThread)>0){
 			$thisThread=$thisThread[0];
-			$stmt=$db->prepare('UPDATE ForumThread SET hits = hits + 1');
+			$stmt=$db->prepare('UPDATE ForumThread SET hits = hits + 1 WHERE idThread = :idThread');
+			$stmt->bindParam(':idThread', $threadId, PDO::PARAM_INT);
 			$stmt->execute();
+			$validReference=true;
 		}
 	}
 
+	if(!$validReference){
+		$thisThread=$defaultThread;
+	}
+
+	$thisPosts=thread_listPosts($threadId);
 	$numberPosts=count($thisPosts);
 	$threadOP=$thisThread['idUser'];
 	$thisOP=$allUsers[$threadOP];
 ?>
 
 <script>
-$(function() {
+$(function(){
 	$('#nav_forum').addClass('active');
 });
 </script>
@@ -36,8 +40,6 @@ $(function() {
 <?if($loggedIn){?>
 <div class="ink-grid push-center all-75 medium-90 small-100 tiny-100">
 <div class="column-group half-vertical-space">
-
-<!-- BEGIN CURRENT EVENTS SECTION -->
 <h5 class="slab half-vertical-space">
 	<a href="forum.php">Forum</a>
 	&gt; <?=$thisThread['title']?>
@@ -57,34 +59,36 @@ $(function() {
 			<?=forum_printDate($thisThread)?>
 			</small>
 		</p>
-		<p class="vertical-space">
-			<?=$thisThread['message']?>
-		</p>
+		<?forum_printPost(null, $thisThread)?>
 		<p class="no-margin align-right">
-			<small><a href="#" class="ink-button"><i class="fa fa-pencil"></i> Reply</a></small>
-			<small><a href="quote_thread.php?id=<?=$threadId?>" class="ink-button"><i class="fa fa-quote-right"></i> Quote</a></small>
+			<small><a href="post_reply.php?id=<?=$threadId?>" class="ink-button"><i class="fa fa-pencil"></i> Reply</a></small>
+			<small><a href="post_quote.php?tid=<?=$threadId?>" class="ink-button"><i class="fa fa-quote-right"></i> Quote</a></small>
 			<?if($threadOP==$thisUser){?>
 			<small><a href="delete_thread.php?id=<?=$threadId?>" class="ink-button"><i class="fa fa-remove"></i> Delete</a></small>
 			<?}?>
 		</p>
 	</div>
 </div>
-
+<?$i=0;?>
 <?if($numberPosts>0){
 	foreach($thisPosts as $currentPost){
-	$postId=$currentPost['idPost']-1;
+	$postId=$currentPost['idPost'];
 	$thisPoster=$currentPost['idUser'];
 	if($postId<0){
 		$postId=0;
-	}?>
+	}
+	if($i==$numberPosts-1){?>
+	<div id="last" class="column-group panel half-vertical-space">
+	<?}else{?>
 	<div class="column-group panel half-vertical-space">
+	<?}?>
 		<div class="column all-15">
 			<p><a href="<?=users_viewProfile($thisPoster)?>">
 				<b><?=$currentPost['username']?></b>
 			</a></p>
 			<img class="half-bottom-space" src="<?=users_getSmallAvatar($thisPoster)?>">
 		</div>
-		<div class=" column all-85">
+		<div class="column all-85">
 		<b>Re: <?=$thisThread['title']?></b>
 		<p class="no-margin">
 			<small class="slab">
@@ -92,73 +96,25 @@ $(function() {
 			<?=forum_printDate($currentPost)?>
 			</small>
 		</p>
-		<?if(isset($currentPost['idQuote'])){
-			$quoteId = $currentPost['idQuote'];
-
-			if ($quoteId==0) {
-				$quotedPost = $thisThread;
-			}
-			else {
-				$quotedPost = $thisPosts[$quoteId];
-			}
-		?>
-		<p class="half-vertical-space">
-			<small class="no-margin"><?=$quotedPost['username']?> wrote:</small>
-			<blockquote class="no-margin">
-				<?=$quotedPost['message']?>
-			</blockquote>
-		</p>
-		<?}?>
-		<p class="vertical-space"><?=$currentPost['message']?></p>
+		<?forum_printPost($currentPost, $thisThread)?>
 			<p class="no-margin align-right">
-			<small><a href="#write-comment" class="ink-button"><i class="fa fa-pencil"></i> Reply</a></small>
+			<small><a href="post_reply.php?id=<?=$threadId?>" class="ink-button"><i class="fa fa-pencil"></i> Reply</a></small>
+			<small><a href="post_quote.php?tid=<?=$threadId?>&id=<?=$postId?>" class="ink-button"><i class="fa fa-quote-right"></i> Quote</a></small>
 			<?if($currentPost['idUser']==$thisUser){?>
-			<small><a class="ink-button"><i class="fa fa-remove"></i> Delete</a></small>
-			<?}else{?>
-			<small><a class="ink-button"><i class="fa fa-quote-right"></i> Quote</a></small>
+			<small><a href="delete_post.php?id=<?=$postId?>" class="ink-button"><i class="fa fa-remove"></i> Delete</a></small>			
 			<?}?>
 		</p>
-		</div>
 	</div>
+	</div>
+	<?$i++?>
 	<?}?>
 <?}else{?>
 	<p class="panel">This forum thread has no replies :(</p>
 <?}?>
-
-<!-- BEGIN REPLY SECTION -->
-<div class="all-50" id="write-comment">
-<b>Write a reply</b>
-<form action="actions/action_reply.php" method="POST" class="ink-form ink-formvalidation">
-	<input type="hidden" name="idUser" value="<?=$_SESSION['userid']?>"></input>
-	<input type="hidden" name="idThread" value="<?=$threadId?>"></input>
-	<div class="control-group column-group">
-		<div class="control required all-100">
-			<textarea name="message" rows="4" cols="80" placeholder="Insert your message here..."></textarea>
-		</div>
-	</div>
-	<div class="no-margin all-100">
-		<button type="submit" name="sub" class="ink-button success">
-		<i class="fa fa-share"></i> Reply
-		</button>
-		<button type="reset" name="sub" value="Clear" class="ink-button">
-		<i class="fa fa-eraser"></i> Clear
-		</button>
-	</div>
-</form>
-</div>
-<!-- END DYNAMIC SECTION -->
 </div>
 </div>
-<?}else{?>
-<div class="ink-grid push-center all-45 large-60 medium-80 small-100 tiny-100">
-	<div class="column ink-alert block error">
-		<h4>Forbidden</h4>
-		<p>You don't have permission to access this page!</p>
-		<p>Please <a href="login.php">log in</a> with your account first.</p>
-	</div>
-</div>
-<?}?>
-
-<?
-	include('template/footer.php');
+<?}else{
+	include_once('message_guest.php');
+}
+include('template/footer.php');
 ?>

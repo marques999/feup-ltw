@@ -1,5 +1,7 @@
 <?
-	session_start();
+	if(!isset($_SESSION)){
+		session_start();
+	}
 	include('database/session.php');
 ?>
 <!DOCTYPE html>
@@ -41,7 +43,7 @@ $(function() {
 	});
 
 	document_window.resize(function() {
-		header_height = header_container.outerHeight() + 1;
+		header_height = header_container.outerHeight();
 	});
 });
 </script>

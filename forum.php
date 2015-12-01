@@ -4,13 +4,13 @@
 	include_once('database/users.php');
 	include('template/header.php');
 
-	$allThreads = forum_allThreads();
-	$numberReplies = forum_countReplies();
-	$lastReplies = forum_lastReplies();
+	$allThreads=forum_allThreads();
+	$numberReplies=forum_countReplies();
+	$lastReplies=forum_lastReplies();
 ?>
 
 <script>
-$(function() {
+$(function(){
 	$('#nav_forum').addClass('active');
 });
 </script>
@@ -18,7 +18,7 @@ $(function() {
 <?if($loggedIn){?>
 <div class="ink-grid push-center all-100">
 <p><small>
-	<button class="ink-button"><i class="fa fa-plus"></i> New Thread</button>
+	<a href="create_thread.php" class="ink-button"><i class="fa fa-plus"></i> New Thread</a>
 </small></p>
 <table class="ink-table alternating hover">
 <thead>
@@ -30,7 +30,7 @@ $(function() {
 </thead>
 <tbody>
 <?foreach($allThreads as $currentThread){
-	$threadId=$currentThread['idThread'] - 1;
+	$threadId=$currentThread['idThread'];
 	$hasReplies=isset($lastReplies[$threadId]);
 	$threadUser=$currentThread['idUser'];
 	$thisOP=$allUsers[$threadUser];
@@ -50,7 +50,7 @@ $(function() {
 			<p><small><?=forum_printDate($currentThread)?></small></p>
 		</td>
 		<?if($hasReplies){?>
-			<td class="align-center"><?=$numberReplies[$threadId]['count']?></td>
+			<td class="align-center"><?=$numberReplies[$threadId]?></td>
 		<?}else{?>
 			<td class="align-center">0</td>
 		<?}?>
@@ -66,22 +66,16 @@ $(function() {
 		<td>
 			<i class="fa fa-user"></i>
 			<a href="<?=users_viewProfile($lastPosterId)?>"><?=$lastPoster['username']?></a>
-			<p><small><?=forum_printDate($currentThread)?></small></p>
+			<p><small><?=forum_printDate($lastReplies[$threadId])?></small></p>
 		</td>
 	</tr>
 <?}?>
 </tbody>
 </table>
 </div>
-<?}else{?>
-<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
-	<div class="column ink-alert block error">
-		<h4>Forbidden</h4>
-		<p>You don't have permission to access this page!</p>
-		<p>Please <a href="login.php">log in</a> with your account first.</p>
-	</div>
-</div>
-<?}?>
+<?}else{
+	include_once('message_guest.php');
+}?>
 <?
 	include('template/footer.php');
 ?>

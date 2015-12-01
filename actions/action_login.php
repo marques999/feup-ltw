@@ -4,6 +4,7 @@
 	include_once('../database/action.php');
 	include_once('../database/country.php');
 	include_once('../database/salt.php');
+	include_once('../database/tags.php');
 	include_once('../database/users.php');
 
 	$sessionId = validateLogin($_POST['username'], $_POST['password']);

@@ -153,6 +153,7 @@ input[type="search"]::-webkit-search-decoration {
 
 p {
 	font-size: 1.0em;
+	word-wrap: break-word;
 }
 
 table {

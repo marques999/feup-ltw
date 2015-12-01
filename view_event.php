@@ -24,7 +24,7 @@
 
 		$isPrivate = ($thisEvent['private'] == 1);
 		$thisParticipants = events_listParticipants($eventId);
-		$thisComments = events_listTopComments($eventId, 5);
+		$thisComments = listCommentsByEvent($eventId);
 		$ownerId = $thisEvent['idUser'];
 		$getOwner = users_listById($ownerId);
 
@@ -33,6 +33,7 @@
 		}
 
 		$loggedUser = 0;
+		$canFollow=$currentDate<$thisEvent['date'];
 
 		if ($loggedIn) {
 
@@ -45,13 +46,14 @@
 
 			if ($wasInvited && isset($getSender['idSender'])) {
 				$senderId = $getSender['idSender'];
-				$sender = $allUsers[$senderId - 1];
+				$sender = $allUsers[$senderId];
 			}
 		}
 	}
 
 	$numberParticipants = count($thisParticipants);
 	$numberComments = count($thisComments);
+	$startId = 0;
 ?>
 
 <?if($isPrivate && !$isOwner && !($wasInvited || $isParticipating)){?>
@@ -68,16 +70,58 @@
 </div>
 <?}else{?>
 <script src="https://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-565c6b43113a666a" async="async"></script>
 <script>
+var startId=0;
+var numberComments=<?=$numberComments?>;
+function fetchComments(div, elem){
+	$.ajax({
+		type: 'post',
+		url: 'list_comments.php',
+		data: {
+			'eventId': <?=$eventId?>,
+			'startId': startId
+		},
+		success: function(destination)
+		{
+			div.append(destination);
+			nextId = startId + 5;
+			remainingComments = numberComments - nextId;
+			if(remainingComments>0)
+			{
+				if(remainingComments>5)
+				{
+					remainingComments=5;
+				}
+				elem.text("> Next " + remainingComments);
+			}
+			else
+			{
+				elem.hide();
+			}
+			startId=nextId;
+		}
+	});
+}
 $(function() {
+	var commentsForm = $('#write-comment');
+	var commentsSection = $('#comment-section');
+	var expandComments = $('#expand-comments');
+
 	$('#nav_browse').addClass('active');
-	$("#write-comment").hide();
+	$(commentsForm).hide();
+	fetchComments(commentsSection, expandComments);
+	$(expandComments).click(function(evt){
+		fetchComments($('#comment-section'), $(this));
+	});
+
+	<?if($canFollow){?>
 	$('a#follow-button').click(function(evt){
 		if ($(evt.target).parent().hasClass('active')) {
 			targetPage = 'actions/action_unfollow.php';
 		}
 		else {
-			targetPage = 'actions/action_follow.php'
+			targetPage = 'actions/action_follow.php';
 		}
 		$.ajax({
 			type: 'post',
@@ -96,6 +140,8 @@ $(function() {
 			}
 		});
 	});
+	<?}?>
+
 	$('#accept-button').click(function() {
 		$.ajax({
 			type: 'post',
@@ -133,8 +179,10 @@ $(function() {
 		});
 	});
 	$('#comment-button').click(function() {
-		$('#write-comment').slideToggle('fast');
-		$(this).parent().toggleClass('active');
+		if (!$(this).parent().hasClass("disabled")) {
+			commentsForm.slideToggle('fast');
+			$(this).parent().toggleClass('active');
+		}
 	});
 });
 
@@ -152,7 +200,6 @@ google.maps.event.addDomListener(window, 'load', function() {
 	var mapContainer = $('div#map-container');
 	var marker = null;
 	var latlngStr = locationString.text().split(',', 2);
-
 	var latlng = {
 		lat:parseFloat(latlngStr[0]),
 		lng:parseFloat(latlngStr[1])
@@ -197,9 +244,10 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<div class="push-left half-vertical-space">
 		<h1 class="slab no-margin"><?=$thisEvent['name']?></h1>
 		<h5 class="slab no-margin"><?=$thisEvent['type']?></h5>
+
 	</div>
 	<!-- END EVENT TITLE -->
-
+<div class="clear addthis_sharing_toolbox"></div>
 
 	<!-- BEGIN EVENT MANAGEMENT -->
 	<?if($isOwner) {?>
@@ -220,7 +268,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 		<p class="no-margin fw-medium">
 			<i class="fa fa-calendar"></i>
 			<b>Date:</b>
-			<?=gmdate("l, d/m/Y H:i", $thisEvent['date'])?>
+			<?=events_getDate($thisEvent)?>
 		</p>
 	</div>
 	<!-- END EVENT DATE -->
@@ -228,7 +276,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 	<!-- BEGIN EVENT PHOTO/DESCRIPTION -->
 	<figure class="ink-image half-vertical-space">
-		<img src="holder.js/1200x600/auto/ink" alt="">
+		<img src="<?=events_getImage($thisEvent,'original')?>">
 		<figcaption class="condensed-regular">
 			<?=$thisEvent['description']?>
 		</figcaption>
@@ -277,15 +325,20 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<?if($loggedIn){?>
 	<nav id="#nav" class="ink-navigation all-100 half-vertical-space">
 		<ul class="pills">
-		<?if($isParticipating){?>
-			<li class="active"><a id="follow-button"><i class="fa fa-check"></i> Following</a></li>
-		<?}else{?>
-			<li><a id="follow-button"><i class="fa fa-check"></i> Follow</a></li>
-		<?}?>
+		<li class="<?if(!$canFollow){?>disabled<?}else if($isParticipating){?>active<?}?>">
+			<a id="follow-button">
+			<i class="fa fa-check"></i>
+			<?if($isParticipating){?>
+				Following
+			<?}else{?>
+				Follow
+			<?}?>
+			</a>
+		</li>
 		<?if($isParticipating){?>
 			<li><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> Comment</a></li>
 		<?}else{?>
-			<li class="disabled"><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> Comment</a></li>
+			<li class="disabled"><a id="comment-button"><i class="fa fa-comment"></i> Comment</a></li>
 		<?}?>
 		<?if($isParticipating){?>
 			<li><a href="#"><i class="fa fa-upload"></i> Upload Photos</a></li>
@@ -297,29 +350,21 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<?}?>
 	<!-- END USER ACTIONS -->
 
+
 	<!-- BEGIN PARTICIPANTS SECTION -->
 	<h2>Participants (<?=$numberParticipants?>)</h2>
-	<div class="half-vertical-space" id="table-participants">
+	<div class="column-group half-vertical-space" id="table-participants">
 		<?if($numberParticipants>0){
-		for($i=0;$i<$numberParticipants;$i++) {
+		for($i=0;$i<$numberParticipants;$i++){
 			$currentParticipant=$thisParticipants[$i];
-			$currentParticipantId=$currentParticipant['idUser'];
-
-			if($i%3==0){?>
-				<div class="column-group half-gutters">
-			<?}?>
-
-			<div class="all-33 medium-50 small-50 tiny-100">
+			$currentParticipantId=$currentParticipant['idUser'];?>
+			<div class="column quarter-vertical-space all-33 medium-50 small-100 tiny-100">
 				<img src="<?=users_getSmallAvatar($currentParticipantId)?>"/>
 				<b class="quarter-space">
 				<a href="<?=users_viewProfile($currentParticipantId)?>"><?=$currentParticipant['username']?></a>
 				</b>
 			</div>
-
-			<?if ($i == count($thisParticipants) - 1){?>
-					</div>
 			<?}?>
-		<?}?>
 		<?}else{?>
 			<p class="panel">This event has no users participating :(</p>
 		<?}?>
@@ -327,45 +372,35 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<!-- END PARTICIPANTS SECTION -->
 
 
-	<!-- BEGIN COMMENTS SECTION -->
+	<!-- BEGIN DYNAMIC COMMENTS SECTION -->
 	<?if($isParticipating || $isOwner){?>
 		<h2 class="no-margin" id="comments">Comments (<?=$numberComments?>) </h2>
-		<div class="column-group all-100 half-vertical-space">
-		<?if($numberComments > 0) {
-			foreach($thisComments as $currentComment) {
-			if (isset($currentComment['idUser'])) {
-				$commentAuthorId = $currentComment['idUser'];
-			}
-			else {
-				$commentAuthorId = 0;
-			}
-			$commentAuthor = $allUsers[$commentAuthorId];?>
-			<div class="column all-100 half-vertical-space">
-				<img class="push-left half-right-space" src="<?=users_getSmallAvatar($commentAuthorId)?>"/>
-				<a href="<?=users_viewProfile($commentAuthorId)?>"><?=$commentAuthor['username']?></a>
-				<small><?=gmdate("l, d/m/Y H:i", $currentComment['timestamp'])?></small>
-				<p class="fw-medium"><?=$currentComment['message']?></p>
-			</div>
-			<?}?>
-			</div>
-		<?}else{?>
+		<div id="comment-section" class="column-group all-100 half-vertical-space">
+		<?if($numberComments<=0){?>
 			<p class="panel">This event has no comments :(</p>
 		<?}?>
+		</div>
+		<?if($numberComments>0){?>
+		<div class="align-center">
+			<button id="expand-comments" class="ink-button"></button>
+		</div>
+		<?}?>
 	<?}?>
-	<!-- END COMMENTS SECTION -->
+	<!-- END DYNAMIC COMMENTS SECTION -->
 
 
-	<!-- BEGIN DYNAMIC SECTION -->
+	<!-- BEGIN WRITE COMMENT SECTION -->
 	<div id="write-comment">
-	<form action="actions/action_comment.php" method="POST" class="ink-form ink-formvalidation all-100">
-		<input type="hidden" name="idUser" value="<?=$_SESSION['userid']?>"></input>
+	<h5 class="slab no-margin">Write a comment...</h5>
+	<form action="actions/action_comment.php" method="POST" class="ink-form ink-formvalidation">
+		<input type="hidden" name="idUser" value="<?=$thisUser?>"></input>
 		<input type="hidden" name="idEvent" value="<?=$eventId?>"></input>
 		<div class="control-group">
 			<div class="control required">
 				<textarea name="message" rows="4" cols="80" placeholder="Write your comment here..."></textarea>
 			</div>
 		</div>
-		<div class="control-group half-gutters">
+		<div class="control-group align-center half-gutters">
 			<button type="submit" name="sub" class="ink-button">
 			<i class="fa fa-share"></i> Send
 			</button>
@@ -375,9 +410,8 @@ google.maps.event.addDomListener(window, 'load', function() {
 		</div>
 	</form>
 	</div>
-	<!-- END DYNAMIC SECTION -->
+	<!-- END WRITE COMMENT SECTION -->
 </div>
-
 <?
 	}
 	include('template/footer.php')

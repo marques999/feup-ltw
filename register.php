@@ -10,6 +10,7 @@
 	}
 ?>
 
+<?if(!$loggedIn){?>
 <script>
 var wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
 var fileInput = $('#file-input').wrap(wrapper);
@@ -192,6 +193,8 @@ function readURL(input) {
 	</div>
 </div>
 </div>
-<?
-	include('template/footer.php');
+<?}else{
+	include_once('message_logout.php');
+}
+include('template/footer.php');
 ?>

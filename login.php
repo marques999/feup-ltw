@@ -3,18 +3,17 @@
 	include_once('database/users.php');
 	include('template/header.php');
 
-	$thisError = 0;
-	if(isset($_GET['error'])) {
-		$thisError = $_GET['error'];
-	}
+	$thisError=safe_getId($_GET,'error');
 ?>
+
 <script>
 $(function(){
 	$('#nav_profile').addClass('active');
 });
 </script>
+
+<?if(!$loggedIn){?>
 <div class="ink-grid push-center all-40 large-60 medium-80 small-100 tiny-100">
-<?if(!isset($_SESSION['username'])){?>
 <form action="actions/action_login.php" method="post" class="ink-form ink-formvalidator">
 	<fieldset>
 		<legend class="align-center">Sign-In / Register</legend>
@@ -27,7 +26,7 @@ $(function(){
 			<label for="username" class="all-25 align-right">Username</label>
 			<div class="control append-symbol all-75">
 				<span>
-					<input name="username" id="username" type="text" data-rules="required" placeholder="Please enter your username">
+					<input name="username" type="text" data-rules="required" placeholder="Please enter your username">
 					<i class="fa fa-user"></i>
 				</span>
 			</div>
@@ -47,28 +46,15 @@ $(function(){
 			</div>
 		</div>
 		<div class="control-group column-group">
-			<div class="control all-100">
-				<p class="align-center">Don't have an account?
-					<a href="register.php">Sign up here!</a>
-				</p>
-			</div>
+			<p class="align-center">Don't have an account?
+				<a href="register.php">Sign up here!</a>
+			</p>
 		</div>
 	</fieldset>
 </form>
-<?}else{?>
-<form action="action_logout.php" method="post" class="ink-form">
-	<fieldset class="align-center">
-		<legend>Terminate Session</legend>
-		<p>Are you sure you want to terminate your current session?</p>
-		<div class="control push-center all-20">
-			<button type="submit" class="ink-button">
-				<i class="fa fa-key"></i> Logout
-			</button>
-		</div>
-	</fieldset>
-</form>
-<?}?>
 </div>
-<?
-	include('template/footer.php');
+<?}else{
+	include_once('message_logout.php');
+}
+include('template/footer.php');
 ?>

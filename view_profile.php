@@ -3,16 +3,15 @@
 	include_once('database/country.php');
 	include_once('database/events.php');
 	include_once('database/users.php');
+	include_once('database/session.php');
 	include('template/header.php');
 
 	$thisUser = $defaultUser;
 	$userId = 0;
 
 	if (isset($_GET['id'])) {
-
-		$userId = intval($_GET['id']);
+		$userId = safe_getId($_GET, 'id');
 		$getUser = users_listById($userId);
-
 		if (count($getUser) > 0) {
 			$thisUser = $getUser[0];
 		}
@@ -26,24 +25,25 @@
 ?>
 
 <?if($isOwner){?>
-	<script>
-	$(function() {
+<script>
+	$(function(){
 		$('#nav_profile').addClass('active');
 	});
-	</script>
+</script>
 <?}?>
 
 <div class="ink-grid push-center all-75 large-75 medium-100 small-90 tiny-100">
 <div class="column-group gutters">
 
+
 	<!-- BEGIN USER AVATAR -->
 	<div class="all-30 large-40 medium-40 small-100 tiny-100">
 		<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
 		<?if($isOwner){?>
-		<p class="align-center all-100">
+		<p class="align-center quarter-vertical-space">
 			<a href="action_logout.php"><button class="ink-button"><i class="fa fa-key"></i> Log out</button></a>
-			<a href="delete_user.php?id=<?=$thisUser?>"><button class="ink-button"><i class="fa fa-user-times"></i> Remove</button></a>
-			</p>
+			<a href="delete_user.php?id=<?=$userId?>"><button class="ink-button"><i class="fa fa-user-times"></i> Remove</button></a>
+		</p>
 		<?}?>
 	</div>
 	<!-- END USER AVATAR -->
@@ -51,9 +51,9 @@
 
 	<!-- BEGIN PROFILE INFORMATION -->
 	<div class="column all-70 large-60 medium-60 small-100 tiny-100">
-	<img src="<?=users_getCountryFlag($thisUser)?>"></img>
-	<h1 class="quarter-top-space"><?=$thisUser['username']?></h1>
-	<p>
+	<h1 class="push-left"><?=$thisUser['username']?></h1>
+	<img class="push-left half-padding" src="<?=users_getCountryFlag($thisUser)?>"></img>
+	<p class="clear">
 	<?if($isOwner){?>
 		<a href="update_profile.php?field=name"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
@@ -86,7 +86,7 @@
 		</div>
 		<?}?>
 	<?}else{?>
-		<p class="panel">This user is currently not attending any events :(</p>
+		<p class="panel">This user is currently not attending any public events :(</p>
 	<?}?>
 	</div>
 	<!-- END ATTENDED EVENTS -->
@@ -97,26 +97,24 @@
 	<div class="half-vertical-space">
 	<?if($numberEventsCreated>0){
 	foreach($ownEvents as $currentEvent){?>
-		<div class="half-vertical-space all-100">
+	<div class="half-vertical-space all-100">
 		<?if($isOwner){?>
-			<a href="event_delete.php?id=<?=$currentEvent['idEvent']?>"><i class="fa fa-trash"></i></a>
+			<a href="event_delete.php?id=<?=$currentEvent['idEvent']?>"><i class="fa fa-trash"></i>&nbsp;</a>
 		<?}?>
-			<img src="holder.js/100x64/auto/ink"/>
-			<b class="quarter-space">
-				<a href="<?=events_viewEvent($currentEvent)?>">
-				<?=events_getName($currentEvent)?>
-				</a>
-			</b>
-		</div>
+		<img src="holder.js/100x64/auto/ink"/>
+		<b class="quarter-space">
+			<a href="<?=events_viewEvent($currentEvent)?>">
+			<?=events_getName($currentEvent)?>
+			</a>
+		</b>
+	</div>
 	<?}?>
 	<?}else{?>
-		<p class="panel">This user has not created any events :(</p>
+		<p class="panel">This user has not created any public events :(</p>
 	<?}?>
 	</div>
 	</div>
 	<!-- END USER EVENTS -->
-
-
 </div>
 </div>
 
