@@ -242,7 +242,7 @@
 
 	function validateLogin($username, $password) {
 		global $db;
-		$safeUsername=strip_tags_content($username);
+		$safeUsername=safe_trim($username);
 		$stmt = $db->prepare('SELECT * FROM Users WHERE username = :username');
 		$stmt->bindParam(':username', $safeUsername, PDO::PARAM_STR);
 		$stmt->execute();

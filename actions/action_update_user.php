@@ -1,52 +1,97 @@
 <?
-	include_once('../database/connection.php');
+	if (!isset($_SESSION)) {
+		session_start();
+	}
+
+	include_once('../database/action.php');
 	include_once('../database/country.php');
 	include_once('../database/salt.php');
 	include_once('../database/users.php');
 
-	if (isset($_POST['idUser']) && isset($_POST['field'])) {
+	if (safe_check($_POST, 'idUser') && safe_check($_POST, 'field')) {
 
-		$stmt = $db->prepare('SELECT username FROM Users WHERE username = :username');
-		$stmt->bindParam(':username', $username, PDO::PARAM_STR);
+		$userId = safe_getId($_POST, 'idUser');
+		$changedField = safe_getId($_POST, 'field');
+		$stmt = $db->prepare('SELECT * FROM Users WHERE idUser = :idUser');
+		$stmt->bindParam(':idUser', $userId, PDO::PARAM_INT);
 		$stmt->execute();
-		$userExists = $stmt->fetchAll() != false;
-		$changeField = $_POST['field'];
+		$result = $stmt->fetchAll();
+		$userExists =  ($result != false) && is_array($result) && count($result) > 0;
+		$currentUser = $result[0];
+		$oldPassword = $currentUser['password'];
 		$validOperation = false;
 
-		if ($changeField = 'password' && isset($_POST['password'])) {
-			if (isset($_POST['password'])) {
-				$validOperation = true;
-				$stmt = $db->prepare('UPDATE Users SET password = :password WHERE idUser = :idUser');
-				$stmt->bindParam(':password', $_POST['password'], PDO::PARAM_STR);
+		if ($changedField == 1) {
+
+			if (isset($_POST['current-password']) && isset($_POST['next-password']) && isset($_POST['confirm-password'])) {
+
+				$currentPassword = safe_trim($_POST['current-password']);
+				$confirmPassword = safe_trim($_POST['confirm-password']);
+				$safePassword = safe_trim($_POST['next-password']);
+
+				if (!validate_password($currentPassword, $oldPassword)){
+					header("Location: ../update_profile.php?field=$changedField&error=1");
+				}
+				else if (validate_password($safePassword, $oldPassword)){
+					header("Location: ../update_profile.php?field=$changedField&error=3");
+				}
+				else if ($safePassword != $confirmPassword) {
+					header("Location: ../update_profile.php?field=$changedField&error=2");
+				}
+				else {
+					$validOperation = true;
+					$newPassword = create_hash($safePassword);
+					$stmt = $db->prepare('UPDATE Users SET password = :password WHERE idUser = :idUser');
+					$stmt->bindParam(':password', $newPassword, PDO::PARAM_STR);
+				}
 			}
 		}
-		else if ($changeField = 'name') {
-			if (isset($_POST['first-name']) && isset($_POST['last-name'])) {
+		else if ($changedField == 2) {
+
+			if (safe_check($_POST, 'first-name') && safe_check($_POST, 'last-name')) {
 				$validOperation = true;
 				$fullName = "{$_POST['first-name']} {$_POST['last-name']}";
+				$safeName = safe_trim($fullName);
 				$stmt = $db->prepare('UPDATE Users SET name = :name WHERE idUser = :idUser');
-				$stmt->bindParam(':name', $fullName, PDO::PARAM_STR);
+				$stmt->bindParam(':name', $safeName, PDO::PARAM_STR);
 			}
 		}
-		else if ($changeField == 'email') {
-			if (isset($_POST['email'])) {
+		else if ($changedField == 3) {
+
+			if (safe_check($_POST, 'email')) {
 				$validOperation = true;
+				$safeEmail = safe_trim($_POST['email']);
 				$stmt = $db->prepare('UPDATE Users SET email = :email WHERE idUser = :idUser');
-				$stmt->bindParam(':email', $_POST['email'], PDO::PARAM_STR);
+				$stmt->bindParam(':email', $safeEmail, PDO::PARAM_STR);
 			}
 		}
-		else if ($changeField == 'location') {
+		else if ($changedField == 4) {
+
 			if (isset($_POST['location']) && isset($_POST['country'])) {
 				$validOperation = true;
+				$safeLocation = safe_trim($_POST['location']);
 				$stmt = $db->prepare('UPDATE Users SET location = :location, country = :country WHERE idUser = :idUser');
-				$stmt->bindParam(':location', $_POST['location'], PDO::PARAM_STR);
+				$stmt->bindParam(':location', $safeLocation, PDO::PARAM_STR);
 				$stmt->bindParam(':country', $_POST['country'], PDO::PARAM_STR);
 			}
 		}
 
 		if ($validOperation) {
-			$stmt->bindParam(':idUser', $_POST['idUser'], PDO::PARAM_STR);
-			$stmt->execute();
+
+			$stmt->bindParam(':idUser', $userId, PDO::PARAM_INT);
+
+			if ($stmt->execute()) {
+				header("Location: ../view_profile.php?id=$userId");
+			}
+			else {
+				header("Location: ../database_error.php");
+			}
 		}
+		else {
+			safe_redirect("../index.php");
+		}
+	}
+	else {
+		safe_redirect("../index.php");
 	}
 ?>

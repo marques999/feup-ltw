@@ -71,9 +71,9 @@ google.maps.event.addDomListener(window, 'load', function() {
 	});
 });
 </script>
-<div class="ink-grid push-center all-60 large-60 medium-80 small-100 tiny-100">
-<div class="column all-70 gutters">
-	<form action="actions/action_create_event.php" class="ink-form ink-formvalidator">
+<div class="ink-grid all-100">
+<div class="column-group gutters">
+	<form action="actions/action_create_event.php" method="post" class="ink-form ink-formvalidator all-60 small-100 tiny-100">
 		<fieldset>
 			<legend class="align-center">Create Event</legend>
 			<div class="control-group required column-group half-gutters">
@@ -81,12 +81,6 @@ google.maps.event.addDomListener(window, 'load', function() {
 				<div class="control all-60">
 					<input name="name" id="name" type="text" data-rules="required|alpha" placeholder="Please enter the event name">
 				</div>
-				<!--
-				<label for="private">Private</label>
-				<div class="control all-20">
-					<input type="checkbox" id="private" name="private" value="Private">
-				</div>
-				-->
 			</div>
 
 
@@ -182,17 +176,16 @@ google.maps.event.addDomListener(window, 'load', function() {
 			</div>
 		</div>
 		<!-- END EVENT MAP -->
+
+		<label for="private">Private</label>
+		<div class="control all-20">
+			<input type="checkbox" id="private" name="private" value="Private">
+		</div>
+
 	</div>
 </div>
-<?}else{?>
-<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
-	<div class="column ink-alert block error">
-		<h4>Forbidden</h4>
-		<p>You don't have permission to access this page!</p>
-		<p>Please <a href="login.php">log in</a> with your account first.</p>
-	</div>
-</div>
-<?}?>
-<?
-	include('template/footer.php');
+<?}else{
+	include_once('message_guest.php');
+}
+include('template/footer.php');
 ?>

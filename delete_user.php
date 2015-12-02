@@ -3,16 +3,15 @@
 	include_once('database/users.php');
 	include_once('database/session.php');
 	include('template/header.php');
-
-	$userId=0;
-	$sameUser=false;
-
-	if(isset($_GET['id'])&&$loggedIn){
-		$userId=intval($_GET['id']);
+	
+	if(safe_check($_GET,'id')&&$loggedIn){
+		$userId=safe_getId($_GET,'id');
 		$userExists=users_idExists($userId);
-		if($userExists){
-			$sameUser=($userId==$thisUser);
-		}
+		$isOwner=$userExists&&($userId==$thisUser);
+	}
+	else {
+		$isOwner=false;
+		$userId=0;
 	}
 ?>
 
@@ -23,7 +22,7 @@ $(function(){
 </script>
 
 <?if($loggedIn){?>
-	<?if($sameUser){?>
+	<?if($isOwner){?>
 	<div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 		<div class="column all-100 ink-alert block error">
 			<h4>Delete Account</h4>

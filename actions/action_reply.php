@@ -1,11 +1,14 @@
 <?
+	if (!isset($_SESSION)) {
+		session_start();
+	}
+
 	include_once('../database/action.php');
 	include_once('../database/forum.php');
-	include_once('../database/session.php');
-	include_once('../database/tags.php');
 	include_once('../database/users.php');
+	include_once('../database/session.php');
 
-	if (isset($_POST['idUser']) && isset($_POST['idThread'])) {
+	if (safe_check($_POST, 'idUser') && safe_check($_POST, 'idThread')) {
 		$thisThread = safe_getId($_POST, 'idThread');
 		$thisParticipant = safe_getId($_POST, 'idUser');
 		$userExists = users_idExists($thisParticipant);
@@ -18,7 +21,7 @@
 
 		if ($userExists) {
 
-			$safeMessage = strip_tags_content($_POST['message']);
+			$safeMessage = safe_trim($_POST['message']);
 
 			if ($isQuote) {
 				$stmt = $db->prepare('INSERT INTO ForumPost VALUES(NULL, :idThread, :idUser, :message, :timestamp, :idQuote)');
@@ -40,16 +43,11 @@
 				header("Location: ../database_error.php");
 			}
 		}
+		else {
+			safe_redirect("../forum.php");
+		}
 	}
 	else {
-
-		if (isset($_SERVER['HTTP_REFERER'])) {
-			$refererUrl = $_SERVER['HTTP_REFERER'];
-		}
-		else {
-			$refererUrl = '../forum.php';
-		}
-
-		header("Location: $refererUrl");
+		safe_redirect("../forum.php");
 	}
 ?>

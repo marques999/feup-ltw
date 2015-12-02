@@ -5,16 +5,18 @@
 	include_once('database/users.php');
 
 	$thisEvent = $defaultEvent;
-	$eventId=safe_getId($_POST,'eventId');
-	$startId=safe_getId($_POST,'startId');
+	$eventId = 0;
+	$startId = 0;
 
-	if (isset($_POST['eventId'])) {
-		$thisComments=listCommentsByEvent($eventId);
-		$numberCommentsPage=5;
-		$numberComments=count($thisComments);
+	if (safe_check($_POST, 'eventId')) {
+		$eventId = safe_getId($_POST,'eventId');
+		$thisComments = listCommentsByEvent($eventId);
+		$numberCommentsPage = 5;
+		$numberComments = count($thisComments);
 	}
 
 	if(isset($_POST['startId'])){	
+		$startId=safe_getId($_POST,'startId');
 		$remainingComments=$numberComments-$startId;
 		if($remainingComments<5){
 			$numberCommentsPage=$remainingComments;
@@ -23,7 +25,7 @@
 
 	for($i=$startId;$i<$startId+$numberCommentsPage;$i++){
 		$currentComment=$thisComments[$i];
-		if(isset($currentComment['idUser'])){
+		if(safe_check($currentComment, 'idUser')){
 			$commentAuthorId = $currentComment['idUser'];
 		}
 		else{

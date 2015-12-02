@@ -1,22 +1,27 @@
 <?
+	if (!isset($_SESSION)) {
+		session_start();
+	}
+
 	include_once('../database/action.php');
 	include_once('../database/comments.php');
-	include_once('../database/tags.php');
 	include_once('../database/users.php');
+	include_once('../database/session.php');
 
-	if (isset($_POST['idUser']) && isset($_POST['idEvent'])) {
-		$thisEvent = intval($_POST['idEvent']);
-		$thisParticipant = intval($_POST['idUser']);
+	if (safe_check($_POST, 'idEvent') && safe_check($_POST, 'idUser')) {
+
+		$thisEvent = safe_getId($_POST, 'idEvent');
+		$thisParticipant = safe_getId($_POST, 'idUser');
 		$isParticipating = users_isParticipating($thisParticipant, $thisEvent);
 		$userExists = users_idExists($thisParticipant);
-		$currentTime = time();
 
 		if ($userExists && $isParticipating) {
-			$safeMessage = strip_tags_content($_POST['message']);
+
+			$safeMessage = safe_trim($_POST['message']);
 			$stmt = $db->prepare('INSERT INTO Comments VALUES(NULL, :idUser, :idEvent, :timestamp, :message)');
 			$stmt->bindParam(':idUser', $thisParticipant, PDO::PARAM_INT);
 			$stmt->bindParam(':idEvent', $thisEvent, PDO::PARAM_INT);
-			$stmt->bindParam(':timestamp', $currentTime, PDO::PARAM_INT);
+			$stmt->bindParam(':timestamp', $currentDate, PDO::PARAM_INT);
 			$stmt->bindParam(':message', $safeMessage, PDO::PARAM_STR);
 
 			if ($stmt->execute()) {
@@ -26,14 +31,11 @@
 				header("../database_error.php");
 			}
 		}
-	}
-
-	if (isset($_SERVER['HTTP_REFERER'])) {
-		$refererUrl = $_SERVER['HTTP_REFERER'];
+		else {
+			safe_redirect("../view_event.php?id=$thisEvent");
+		}
 	}
 	else {
-		$refererUrl = 'index.php';
+		safe_redirect("../view_event.php?id=$thisEvent");
 	}
-
-	header("Location: $refererUrl");
 ?>

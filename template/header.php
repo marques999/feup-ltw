@@ -20,6 +20,9 @@
 <link rel="stylesheet" type="text/css" href="css/my-fonts.css">
 <link rel="stylesheet" type="text/css" href="css/my-navigation.css">
 <link rel="stylesheet" type="text/css" href="css/my-forms.css">
+<noscript>
+<meta http-equiv="refresh" content="0; url=message_noscript.php" />
+</noscript>
 <script type="text/javascript" src="js/modernizr.js"></script>
 <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
 <script type="text/javascript">

@@ -43,8 +43,8 @@
 
 	function events_nameExists($name) {
 		global $db;
-		$stmt = $db->prepare('SELECT idEven FROM Events WHERE name = :name');
-		$stmt->bindParam(':idEvent', $name, PDO::PARAM_STR);
+		$stmt = $db->prepare('SELECT idEvent FROM Events WHERE name = :name');
+		$stmt->bindParam(':name', $name, PDO::PARAM_STR);
 		$stmt->execute();
 		$result = $stmt->fetchAll();
 		return $result != false && is_array($result) && count($result) > 0;

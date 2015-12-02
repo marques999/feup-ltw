@@ -26,9 +26,9 @@
 
 <?if($isOwner){?>
 <script>
-	$(function(){
-		$('#nav_profile').addClass('active');
-	});
+$(function(){
+	$('#nav_profile').addClass('active');
+});
 </script>
 <?}?>
 
@@ -41,8 +41,8 @@
 		<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
 		<?if($isOwner){?>
 		<p class="align-center quarter-vertical-space">
-			<a href="action_logout.php"><button class="ink-button"><i class="fa fa-key"></i> Log out</button></a>
-			<a href="delete_user.php?id=<?=$userId?>"><button class="ink-button"><i class="fa fa-user-times"></i> Remove</button></a>
+			<a href="update_profile.php?field=1"><button class="ink-button"><i class="fa fa-key"></i> Change Password</button></a>
+			<a href="delete_user.php?id=<?=$userId?>"><button class="ink-button"><i class="fa fa-user-times"></i> Delete Account</button></a>
 		</p>
 		<?}?>
 	</div>
@@ -55,17 +55,17 @@
 	<img class="push-left half-padding" src="<?=users_getCountryFlag($thisUser)?>"></img>
 	<p class="clear">
 	<?if($isOwner){?>
-		<a href="update_profile.php?field=name"><i class="fa fa-plus-circle"></i></a>
+		<a href="update_profile.php?field=2"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
 		<?=$thisUser['name']?></p>
 		<p class="no-margin">
 	<?if($isOwner){?>
-		<a href="update_profile.php?field=email"><i class="fa fa-plus-circle"></i></a>
+		<a href="update_profile.php?field=3"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
 		<b>Contact: </b><a href="mailto:<?=$thisUser['email']?>"><?=$thisUser['email']?></a></p>
 		<p class="no-margin">
 	<?if($isOwner){?>
-		<a href="update_profile.php?field=location"><i class="fa fa-plus-circle"></i></a>
+		<a href="update_profile.php?field=4"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
 	<b>Location: </b><?=users_formatLocation($thisUser)?></p>
 	<!-- END PROFILE INFORMATION -->

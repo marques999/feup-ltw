@@ -254,7 +254,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<nav id="#nav" class="ink-navigation clear">
 		<ul class="pills">
 			<!-- check if user is already participating on the event -->
-			<li><a href="event_edit.php?id=<?=$eventId?>"><i class="fa fa-edit"></i></a></li>
+			<li><a href="event_update.php?id=<?=$eventId?>"><i class="fa fa-edit"></i></a></li>
 			<li><a href="invite.php"><i class="fa fa-user-plus"></i></a></li>
 			<li><a href="event_delete.php?id=<?=$eventId?>"><i class="fa fa-trash"></i></a></li>
 		</ul>

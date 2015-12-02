@@ -36,9 +36,7 @@ $(function(){
 		<img class="all-100" src="<?=events_getImage($currentEvent, 'medium')?>"/>
 		<div class="all-100 half-vertical-space">
 			<b class="half-vertical-space">
-				<a href="view_event.php?id=<?=$eventId?>">
-					<?=events_getName($currentEvent)?>
-				</a>
+				<a href="view_event.php?id=<?=$eventId?>"><?=events_getName($currentEvent)?></a>
 			</b>
 			<p class="no-margin">
 				<small class="slab"><i class="fa fa-calendar"></i>
@@ -54,12 +52,8 @@ $(function(){
 				</small>
 			</p>
 			<p class="no-margin">
-				<small>
-					<a href="event_update.php?id<?=$eventId?>" class="ink-button"><i class="fa fa-pencil"></i> Edit</a>
-				</small>
-				<small>
-					<a href="event_delete.php?id=<?=$eventId?>" class="ink-button"><i class="fa fa-remove"></i> Remove</a>
-				</small>
+				<small><a href="event_update.php?id<?=$eventId?>" class="ink-button"><i class="fa fa-pencil"></i> Edit</a></small>
+				<small><a href="event_delete.php?id=<?=$eventId?>" class="ink-button"><i class="fa fa-remove"></i> Remove</a></small>
 			</p>
 		</div>
 	</div>

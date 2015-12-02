@@ -17,12 +17,12 @@
 	}
 
 	function forum_getNextThread() {
-		
+
 		global $db;
 		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='ForumThread'");
 		$stmt->execute();
 		$result = $stmt->fetch();
-		
+
 		if ($result != false && is_array($result)) {
 			return $result['seq'];
 		}
@@ -31,22 +31,22 @@
 	}
 
 	function forum_getNextPost() {
-		
+
 		global $db;
 		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='ForumPost'");
 		$stmt->execute();
 		$result = $stmt->fetch();
-		
+
 		if ($result != false && is_array($result)) {
 			return $result['seq'];
 		}
-		
+
 		return -1;
 	}
 
 	function forum_printPost($currentPost, $thisThread) {
 		global $allPosts;
-		
+
 		if(isset($currentPost['idQuote'])){
 		$quoteId=$currentPost['idQuote'];
 		$validReference=false;
@@ -79,7 +79,7 @@
 	<?}
 
 	function forum_printDate($threadData) {
-		
+
 		global $defaultThread;
 
 		if (!is_array($threadData) || !isset($threadData['timestamp'])) {
@@ -90,9 +90,9 @@
 	}
 
 	function forum_viewThread($threadData) {
-		
+
 		global $defaultThread;
-	
+
 		if (!is_array($threadData) || !isset($threadData['idThread'])) {
 			$threadData = $defaultThread;
 		}
@@ -108,9 +108,9 @@
 
 	function forum_allThreads() {
 		global $db;
-		$stmt = $db->prepare('SELECT ForumThread.*, 
-			MAX(ForumThread.timestamp + ForumPost.timestamp) AS last 
-			FROM ForumThread JOIN ForumPost 
+		$stmt = $db->prepare('SELECT ForumThread.*,
+			MAX(ForumThread.timestamp + ForumPost.timestamp) AS last
+			FROM ForumThread JOIN ForumPost
 			ON ForumPost.idThread = ForumThread.idThread
 			GROUP BY ForumThread.idThread
 			ORDER BY last DESC');
@@ -119,30 +119,30 @@
 	}
 
 	function forum_countReplies() {
-		
+
 		global $db;
 		$stmt = $db->prepare('SELECT idThread, COUNT(idThread) AS count FROM ForumPost GROUP BY idThread');
 		$stmt->execute();
 		$allThreads = array();
-		
+
 		while(($result = $stmt->fetch()) != null) {
 			$allThreads[$result['idThread']] = $result['count'];
 		}
-		
+
 		return $allThreads;
 	}
 
 	function forum_lastReplies() {
-		
+
 		global $db;
 		$stmt = $db->prepare('SELECT idThread, idUser, MAX(timestamp) AS timestamp FROM ForumPost GROUP BY idThread');
 		$stmt->execute();
 		$allThreads = array();
-		
+
 		while(($result = $stmt->fetch()) != null) {
 			$allThreads[$result['idThread']] = $result;
 		}
-		
+
 		return $allThreads;
 	}
 
@@ -181,17 +181,17 @@
 	}
 
 	function thread_listPosts($thread_id) {
-		
+
 		global $db;
 		$stmt = $db->prepare('SELECT ForumPost.*, username FROM ForumPost JOIN Users ON ForumPost.idThread = :idThread AND Users.idUser = ForumPost.idUser');
 		$stmt->bindParam(':idThread', $thread_id, PDO::PARAM_INT);
 		$stmt->execute();
 		$allPosts = array();
-		
+
 		while(($result = $stmt->fetch()) != null) {
 			$allPosts[$result['idPost']] = $result;
 		}
-		
+
 		return $allPosts;
 	}
 ?>

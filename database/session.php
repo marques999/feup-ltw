@@ -7,7 +7,6 @@
 	if ($loggedIn) {
 		$thisUser = $_SESSION['userid'];
 		$numberInvites = users_countInvites($thisUser);
-
 		if ($numberInvites == null) {
 			$numberInvites = 0;
 		}

@@ -119,7 +119,7 @@ function readURL(input) {
 
 <div class="ink-grid push-center all-50 large-60 medium-80 small-100 tiny-100">
 <div class="column all-70 gutters">
-	<form action="action_create_user.php" method="post" enctype="multipart/form-data" class="ink-form ink-formvalidator">
+	<form action="actions/action_create_user.php" method="post" enctype="multipart/form-data" class="ink-form ink-formvalidator">
 		<fieldset>
 			<legend class="align-center">Register Account</legend>
 			<div class="control-group required column-group half-gutters">

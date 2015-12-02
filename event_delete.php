@@ -7,10 +7,9 @@
 	$thisEvent = $defaultEvent;
 	$eventId = 0;
 	$ownEvent = false;
-
 	if (isset($_GET['id']) && $loggedIn) {
 		$eventId = intval($_GET['id']);
-		$thisEvent = events_listById($eventId);
+		$thisEvent = events_listById($eventId);	
 		if (is_array($thisEvent)&&count($thisEvent)>0) {
 			$thisEvent = $thisEvent[0];
 			$ownEvent = $thisUser == $thisEvent['idUser'];
