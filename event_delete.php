@@ -2,6 +2,7 @@
 	include_once('database/connection.php');
 	include_once('database/events.php');
 	include_once('database/users.php');
+	include_once('database/session.php');
 	include('template/header.php');
 
 	$thisEvent = $defaultEvent;

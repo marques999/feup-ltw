@@ -24,8 +24,6 @@
 				$stmt->bindParam(':idUser', $thisParticipant, PDO::PARAM_INT);
 				$stmt->execute();
 			}
-
-			return $result;
 		}
 	}
 ?>

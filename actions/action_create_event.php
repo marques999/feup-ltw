@@ -5,9 +5,11 @@
 
 	include_once('../database/action.php');
 	include_once('../database/events.php');
+	include_once('../database/photos.php');
 	include_once('../database/users.php');
 	include_once('../database/session.php');
-	include('../template/header.php');
+
+	$eventId = events_getNextId();
 ?>
 
 <script>
@@ -26,15 +28,14 @@ $(function() {
 		</div>
 	</div>
 <?} else {
-
-/*
-	$uploadDirectory = '../img/events/';
+	
 	$baseFilename = basename($_FILES['image']['name']);
 	$fileExtension = strtolower(substr($baseFilename, strrpos($baseFilename, '.') + 1));
-	$outputFilename = "{$thisUser}.{$fileExtension}";
+	$outputFilename = "{$eventId}.{$fileExtension}";
+	$uploadDirectory = '../img/events/';
 	$uploadFile = "{$uploadDirectory}{$outputFilename}";
-	$smallFile = "{$uploadDirectory}{$thisUser}_small.{$fileExtension}";
-	$mediumFile = "{$uploadDirectory}{$thisUser}_medium.{$fileExtension}";
+	$smallFile = "{$uploadDirectory}{$eventId}_small.{$fileExtension}";
+	$mediumFile = "{$uploadDirectory}{$eventId}_medium.{$fileExtension}";
 
 	echo $baseFilename.'<br>';
 	echo $fileExtension.'<br>';
@@ -44,7 +45,7 @@ $(function() {
 	echo $mediumFile.'<br>';
 
 	if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)){
-		header("Location: message_photo.php");
+		header("Location: ../message_photo.php");
 	}
 
 	$originalImage = image_readFile($uploadFile, $fileExtension);
@@ -54,23 +55,23 @@ $(function() {
 	}
 
 	$smallSize = 200;
-	$mediumSize = 400;
-	$mediumImage = image_resize($originalImage, $mediumSize, $fileExtension);
-	$smallImage = image_crop($mediumImage, $smallSize, $fileExtension);
+	$mediumWidth = 400;
+	$mediumHeight = 256;
+	$mediumImage = image_advancedcrop($originalImage, $mediumWidth, $mediumHeight, $fileExtension);
+	$smallImage = image_resize($mediumImage, $smallSize, $fileExtension);
 
 	image_writeFile($mediumImage, $mediumFile, $fileExtension);
 	image_writeFile($smallImage, $smallFile, $fileExtension);
 	imagedestroy($originalImage);
 	imagedestroy($mediumImage);
 	imagedestroy($smallImage);
-*/
 	
 	// parameter 'name'
 	if (safe_check($_POST, 'name')) {
 		$safeName = safe_trim($_POST['name']);
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
 	// parameter 'idUser'
@@ -78,7 +79,7 @@ $(function() {
 		$userId = safe_getId($_POST, 'idUser');
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
 	// parameter 'description'
@@ -86,24 +87,25 @@ $(function() {
 		$safeDescription = safe_trim($_POST['description']);
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
 	// parameter 'location'
 	if (safe_check($_POST, 'location')) {
-		$safeLocation = safe_trim($_POST['location']);
+		$tempLocation = trim($_POST['location'], '()');
+		$newLocation = safe_trim($tempLocation);
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
-	// parameter 'private'
+	/*// parameter 'private'
 	if (safe_check($_POST, 'private')) {
 		$newPrivate = intval($_POST['private']) ? 1 : 0;
 	}
 	else {
 		safe_redirect("../create_event.php");
-	}
+	}*/
 
 	// parameter 'type'
 	if (safe_check($_POST, 'type')) {
@@ -116,7 +118,7 @@ $(function() {
 		}
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
 	// parameter 'date'
@@ -127,15 +129,15 @@ $(function() {
 		$newDate = strtotime("$newDay {$newHours}:{$newMinutes}");
 	}
 	else {
-		safe_redirect("../create_event.php");
+		//safe_redirect("../create_event.php");
 	}
 
 	$stmt = $db->prepare('INSERT INTO Events VALUES(NULL, :name, :date, :location, :description, :private, :type, :idUser');
-	$stmt->bindParam(':name', $safeName PDO::PARAM_STR);
+	$stmt->bindParam(':name', $safeName, PDO::PARAM_STR);
 	$stmt->bindParam(':date', $newDate, PDO::PARAM_STR);
 	$stmt->bindParam(':location', $safeLocation, PDO::PARAM_STR);
-	$stmt->bindParam(':description', $safeDescription PDO::PARAM_STR);
-	$stmt->bindParam(':private', $newPrivate PDO::PARAM_INT);
+	$stmt->bindParam(':description', $safeDescription, PDO::PARAM_STR);
+	$stmt->bindParam(':private', $newPrivate, PDO::PARAM_INT);
 	$stmt->bindParam(':type', $newType, PDO::PARAM_STR);
 	$stmt->bindParam(':idUser', $userId, PDO::PARAM_INT);
 	$stmt->execute();

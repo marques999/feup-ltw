@@ -103,4 +103,37 @@
 
 		return $thumbnailImage;
 	}
+
+	function image_advancedcrop($src, $cropWidth, $cropHeight, $ext) {
+
+		$newWidth = imagesx($src);
+		$newHeight = imagesy($src);
+		$centerX = round($newWidth / 2);
+		$centerY = round($newHeight / 2);
+		$cropWidthHalf = round($cropWidth / 2);
+		$cropHeightHalf = round($cropHeight / 2);
+
+		$thumbnailImage = imagecreatetruecolor($cropWidth, $cropHeight);
+
+		if ($ext == 'gif' || $ext == 'png') {
+			imagecolortransparent($thumbnailImage, imagecolorallocatealpha($thumbnailImage, 0, 0, 0, 127));
+			imagealphablending($thumbnailImage, false);
+			imagesavealpha($thumbnailImage, true);
+		}
+
+		if ($cropWidth == $newWidth && $cropHeight == $newHeight) {
+			imagecopyresampled($thumbnailImage, $src, 0, 0, 0, 0,
+				$cropWidth, $cropHeight, $newWidth, $newHeight);
+		}
+		else {
+			$x1 = max(0, $centerX - $cropWidthHalf);
+			$y1 = max(0, $centerY - $cropHeightHalf);
+			$x2 = min($newWidth, $centerX + $cropWidthHalf);
+			$y2 = min($newHeight, $centerY + $cropHeightHalf);
+			imagecopyresampled($thumbnailImage, $src, $x2, $y2, $x1, $y1,
+				$cropWidth, $cropHeight, $newWidth, $newWidth);
+		}
+
+		return $thumbnailImage;
+	}
 ?>

@@ -37,16 +37,7 @@ section {
 
 b, strong {
   font-weight: bold;
-}
-
-.panel {
-	border-radius: 2px;
-	-webkit-box-shadow: #dddddd 0 1px 1px 0;
-	-moz-box-shadow: #dddddd 0 1px 1px 0;
-	box-shadow: #dddddd 0 1px 1px 0;
-	padding: 1em;
-	border: 1px solid #BBB;
-	background-color: #FFF;
+   word-break:break-all;
 }
 
 header {
@@ -154,6 +145,7 @@ input[type="search"]::-webkit-search-decoration {
 p {
 	font-size: 1.0em;
 	word-wrap: break-word;
+	 white-space: normal;
 }
 
 table {
@@ -204,6 +196,8 @@ a:hover {
 
 b, strong {
   font-weight: bold;
+   white-space: normal;
+
 }
 
 button {
@@ -461,30 +455,39 @@ figure.ink-image > figcaption {
 	color: #1e5b98;
 }
 
+.panel {
+	border-radius: 2px;
+	-webkit-box-shadow: #dddddd 0 1px 1px 0;
+	-moz-box-shadow: #dddddd 0 1px 1px 0;
+	box-shadow: #dddddd 0 1px 1px 0;
+	padding: 1em;
+	border: 1px solid #BBB;
+	background-color: #FFF;
+}
 
 /*********************/
 
 .ink-button {
-  color: #fff;
-  background: #c91111;
-  border: 1px solid #aa0e0e;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
-  font-weight: 300;
+	color: #fff;
+	background: #c91111;
+	border: 1px solid #aa0e0e;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	-ms-border-radius: 2px;
+	-o-border-radius: 2px;
+	border-radius: 2px;
+	font-weight: 300;
 }
 
 .ink-button:hover,
 .ink-button:active {
-  text-decoration: none;
-  color: #fff;
-  background: #b10f0f;
-  border: 1px solid #920c0c;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
-  -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
+	text-decoration: none;
+	color: #fff;
+	background: #b10f0f;
+	border: 1px solid #920c0c;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
+	-moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
 }
 
 .ink-button:focus {

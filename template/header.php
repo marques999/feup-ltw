@@ -61,12 +61,13 @@ $(function() {
 <ul class="menu horizontal">
 	<li id="nav_index"><a href="index.php"><i class="fa fa-home"></i></a></li>
 	<li id="nav_browse">
-		<a href="#"><i class="fa fa-search"></i> Browse</a>
+		<a href="#"><i class="fa fa-search"></i> Browse Events</a>
 		<ul class="submenu">
-			<li><a href="#">By Name</a></li>
-			<li><a href="#">By Date</a></li>
-			<li><a href="#">By Type</a></li>
-			<li><a href="#">By Location</a></li>
+			<li><a href="event_search.php"><strong>Advanced Search</strong></a></li>
+			<li><a href="event_browse.php?tp=name">Sort By Name</a></li>
+			<li><a href="event_browse.php?tp=date">Sort By Date</a></li>
+			<li><a href="event_browse.php?tp=popularity">Sort By Popularity</a></li>
+			<li><a href="event_browse.php?tp=type">Sort By Type</a></li>
 		</ul>
 	</li>
 	<li id="nav_events"><a href="manage_events.php"><i class="fa fa-gears"></i> Manage Events</a></li>

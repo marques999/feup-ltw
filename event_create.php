@@ -73,7 +73,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 </script>
 <div class="ink-grid all-100">
 <div class="column-group gutters">
-	<form action="actions/action_create_event.php" method="post" class="ink-form ink-formvalidator all-60 small-100 tiny-100">
+	<form action="actions/action_create_event.php" method="post" enctype="multipart/form-data" class="ink-form ink-formvalidator all-60 small-100 tiny-100">
 		<fieldset>
 			<legend class="align-center">Create Event</legend>
 			<div class="control-group required column-group half-gutters">
@@ -88,7 +88,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 			<div class="control-group required column-group half-gutters">
 				<label for="description" class="all-30 align-right">Description:</label>
 				<div class="control all-60">
-					<textarea name="description" rows="8" cols="60" data-rules="required|alpha" placeholder="Please enter the event description"></textarea>
+					<textarea name="description" id="description" rows="8" cols="60" data-rules="required|alpha" placeholder="Please enter the event description"></textarea>
 				</div>
 			</div>
 			<!-- END EVENT DESCRIPTION -->
@@ -99,7 +99,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 				<label for="location" class="all-30 align-right">Location:</label>
 				<div class="control append-symbol all-60">
 					<span>
-					<input type="text" id="location" data-rules="required">
+					<input type="text" id="location" name="location" data-rules="required">
 					<i class="fa fa-globe"></i>
 					</span>
 				</div>
@@ -115,7 +115,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 					</select>
 				</div>
 				<div class="control all-30">
-					<input type="text" name="other-type" data-rules="required">
+					<input type="text" id="other-type" name="other-type" data-rules="required">
 				</div>
 			</div>
 			<!-- END EVENT TYPE -->
@@ -142,10 +142,10 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 			<!-- BEGIN EVENT PHOTOS -->
 			<div class="control-group column-group gutters">
-				<label for="file-input" class="all-50 align-right">Photo:</label>
+				<label for="image" class="all-50 align-right">Photo:</label>
 				<div class="control all-50">
 					<div class="input-file">
-						<input type="file" name="" id="file-input">
+						<input type="file" name="image" id="image">
 					</div>
 				</div>
 			</div>
@@ -156,7 +156,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 			<div class="control-group column-group gutters">
 				 <label for="" class="all-50 align-right"></label>
 				<div class="control all-20 align-right">
-					<input type="submit" name="sub" value="Submit" class="ink-button success" />
+					<input type="submit" value="Submit" class="ink-button" />
 				</div>
 			</div>
 			<!-- END EVENT SUBMIT -->

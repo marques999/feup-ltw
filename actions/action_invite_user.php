@@ -5,7 +5,6 @@
 
 	include_once('../database/actions.php');
 	include_once('../database/events.php');
-	include_once('../database/country.php');
 	include_once('../database/users.php');
 
 	if (safe_check($_POST, 'idEvent') && safe_check($_POST, 'idUser')) {

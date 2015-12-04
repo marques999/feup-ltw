@@ -107,12 +107,20 @@ $(function() {
 	var commentsForm = $('#write-comment');
 	var commentsSection = $('#comment-section');
 	var expandComments = $('#expand-comments');
-
+	var commentButtonLabel = $("span#comment-text");
+	var followButtonLabel =$("span#follow-text");
 	$('#nav_browse').addClass('active');
-	$(commentsForm).hide();
+
+	commentsForm.hide();
+	commentButtonLabel.hide();
+	followButtonLabel.hide();
 	fetchComments(commentsSection, expandComments);
-	$(expandComments).click(function(evt){
+	expandComments.click(function(evt){
 		fetchComments($('#comment-section'), $(this));
+	});
+
+	$("#follow-button").hover(function(){
+		followButtonLabel.stop(true,true).fadeToggle('fast');
 	});
 
 	<?if($canFollow){?>
@@ -328,17 +336,23 @@ google.maps.event.addDomListener(window, 'load', function() {
 		<li class="<?if(!$canFollow){?>disabled<?}else if($isParticipating){?>active<?}?>">
 			<a id="follow-button">
 			<i class="fa fa-check"></i>
+			<span id="follow-text">
 			<?if($isParticipating){?>
 				Following
 			<?}else{?>
 				Follow
 			<?}?>
+			</span>
 			</a>
 		</li>
 		<?if($isParticipating){?>
-			<li><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> Comment</a></li>
+			<li><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> 
+			<span id="comment-text">Comment</span>
+			</a></li>
 		<?}else{?>
-			<li class="disabled"><a id="comment-button"><i class="fa fa-comment"></i> Comment</a></li>
+			<li class="disabled"><a id="comment-button"><i class="fa fa-comment"></i> 
+			<span id="comment-text">Comment</span>
+			</a></li>
 		<?}?>
 		<?if($isParticipating){?>
 			<li><a href="#"><i class="fa fa-upload"></i> Upload Photos</a></li>

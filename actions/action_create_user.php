@@ -62,9 +62,6 @@
 	imagedestroy($resizedImage);
 	imagedestroy($thumbnailImage);
 
-	// BEGIN USER INFORMATION
-	//////////////////////////////
-
 	// parameter 'username'	
 	if (safe_check($_POST, 'username')) {
 		$safeUsername = safe_trim($_POST['username']);

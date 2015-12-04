@@ -97,14 +97,14 @@
 
 		//return glob("img/events/$event_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
 		if ($imageSize == 'small') {
-			return "holder.js/200x100/auto/ink";
+			return "holder.js/200x128/auto/ink"; // tamanho pequeno
 		}
 
 		if ($imageSize == 'medium') {
-			return "holder.js/400x256/auto/ink";
+			return "holder.js/400x256/auto/ink"; // tamanho médio
 		}
 
-		return "holder.js/1200x580/auto/ink";
+		return "holder.js/1200x580/auto/ink"; // amanho original
 	}
 
 	function events_listParticipants($event_id) {
@@ -159,6 +159,17 @@
 		return $stmt->fetchAll();
 	}
 
+	function events_getNextId() {
+		global $db;
+		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Events'");
+		$stmt->execute();
+		$result = $stmt->fetch();
+		if ($result != false && is_array($result)) {
+			return $result['seq'];
+		}
+		return -1;
+	}
+
 	function events_randomEvent() {
 		global $db;
 		$stmt = $db->prepare('SELECT * FROM Events WHERE private = 0 ORDER BY RANDOM() LIMIT 1');
@@ -186,4 +197,103 @@
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
+
+		
+	function getEventsOrdered($type, $order, $curr_time) {
+		global $db;
+		
+		if($type == 'popularity') {
+			if($order == 1) {
+				$stmt = $db->prepare("SELECT Events.*, COUNT(Events.idUser) AS following FROM Events
+										JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
+										AND Events.private = 0 AND :curr_time < Events.date 
+										GROUP BY UserEvents.idEvent
+										ORDER BY following DESC");
+			} 
+			else {
+				$stmt = $db->prepare("SELECT Events.*, COUNT(Events.idUser) AS following FROM Events
+										JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
+										AND Events.private = 0 AND :curr_time < Events.date 
+										GROUP BY UserEvents.idEvent
+										ORDER BY following ASC");
+			}
+		}
+		else {
+			if($order == 1) {
+				$stmt = $db->prepare("SELECT * FROM Events WHERE private = 0 AND :curr_time < date ORDER BY $type DESC");
+			} 
+			else {
+				$stmt = $db->prepare("SELECT * FROM Events WHERE private = 0 AND :curr_time < date ORDER BY $type ASC");
+			}
+		}
+			
+		$stmt->bindParam(':curr_time', $curr_time, PDO::PARAM_INT);
+		$stmt->execute();
+
+		return $stmt->fetchAll();	
+	};
+	
+	function dateQuerry($date_options) {
+		
+		if ($date_options == 0) {
+			return ' AND date >= :date1';
+		}
+		else if ($date_options == 1) {
+			return ' AND date < :date1';
+		}		
+		else if ($date_options == 3 || $date_options == 2) {
+			return ' AND date BETWEEN :date1 AND :date2';
+		}		
+
+		return '';
+	}
+	
+	function bindDateParams($date1, $date2, $date_options, $stmt) {
+
+		if($date_options == 3) {
+			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
+			$stmt->bindParam(':date2', $date2, PDO::PARAM_INT);			
+		}
+		if($date_options == 2) {
+			$endOfDay = $date1 + 60*60*24;
+			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
+			$stmt->bindParam(':date2', $endOfDay, PDO::PARAM_INT);			
+		}
+		else if ($date_options >= 0) {
+			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
+		}
+	}
+	
+	function listFilteredEvents($name, $type, $date1, $date2, $date_options, $order, $orderBy) {
+		$querry = 'SELECT * FROM Events WHERE private = 0';
+		if($name != '') {
+			$querry .= ' AND name = :name';
+		}
+		if($type != '') {
+			$querry .= ' AND type = :type';
+		}
+		
+		$querry .= dateQuerry($date_options);
+		
+		if($order == 1) {
+			$querry .=  ' ORDER BY $orderBy DESC';
+		}
+		else {
+			$querry .=  " ORDER BY $orderBy ASC";
+		}
+		
+		global $db;
+		$stmt = $db->prepare($querry);
+		
+		if($name != '') {		
+			$stmt->bindParam(':name', $name, PDO::PARAM_STR);
+		}
+		if($type != '') {
+			$stmt->bindParam(':type', $type, PDO::PARAM_STR);
+		}
+		bindDateParams($date1, $date2, $date_options, $stmt);
+		
+		$stmt->execute();
+		return $stmt->fetchAll();
+	};
 ?>
