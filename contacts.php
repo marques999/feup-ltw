@@ -3,44 +3,39 @@
 	include_once('database/users.php');
 	include('template/header.php');
 ?>
-<div class="column-group gutters article">
-<div class="xlarge-20 large-20 medium-10 small-5 tiny-5">
-</div>
-<div class="xlarge-60 large-60 medium-80 small-90 tiny-90">
-<div class="all-100 align-center">
-	<img class="half-vertical-space" src="img/feup-logo.png">
-	<h5 class="slab half-top-space no-margin">Faculdade de Engenharia da Universidade do Porto</h5>
-	<addr> R. Dr. Roberto Frias s/n, 4200-465 Porto</addr>
-	<h5 class="slab half-top-space">Mestrado Integrado em Engenharia Informática e Computação</h5>
-</div>
-<h2 class="slab">Group</h2>
-<div class="column level2">
-	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
-	<h4 class="slab">Carlos Samouco</h4>
-	<span>
+<div class="ink-grid">
+<div class="column-group align-center half-vertical-space">
+<img class="half-bottom-space" src="img/feup-logo.png">
+<h5 class="slab half-top-space no-margin">Faculdade de Engenharia da Universidade do Porto</h5>
+<p>R. Dr. Roberto Frias s/n, 4200-465 Porto</p>
+<h5 class="slab half-top-space no-margin">Mestrado Integrado em Engenharia Informática e Computação</h5>
+<p>Linguagens e Tecnologias Web</p>
+<ul class="column-group align-center unstyled">
+	<li class="column all-33 large-33 medium-33 small-100 tiny-100">
+	<div class="panel half-right-space">
+		<img class="all-100 half-bottom-space" src="img/avatars/1.png">
+		<h5 class="slab quarter-vertical-space">Carlos Samouco</h5>
 		<i class="fa fa-envelope"></i>
 		<a href="mailto:up201305187@fe.up.pt">up201305187@fe.up.pt</a>
-	</span>
-	<p>The list of groups will be published shortly</p>
-</div>
-<div class="column level2">
-	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
-	<h4 class="slab">Diana Pinto</h4>
-	<span>
+	</div>
+	</li>
+	<li class="column all-33 large-33 medium-33 small-100 tiny-100">
+	<div class="panel half-right-space">
+		<img class="all-100 half-bottom-space" src="img/avatars/3.png">
+		<h5 class="slab quarter-vertical-space">Diana Pinto</h5>
 		<i class="fa fa-envelope"></i>
 		<a href="mailto:up201303187@fe.up.pt">up201303187@fe.up.pt</a>
-	</span>
-	<p>The list of groups will be published shortly</p>
-</div>
-<div class="column level2">
-	<img class="half-vertical-space" src="holder.js/64x64/auto/ink">
-	<h4 class="slab">Diogo Marques</h4>
-	<span>
+	</div>
+	</li>
+	<li class="column all-33 large-33 medium-33 small-100 tiny-100">
+	<div class="panel half-right-space">
+		<img class="all-100 half-bottom-space"  src="img/avatars/2.png">
+		<h5 class="slab quarter-vertical-space">Diogo Marques</h5>
 		<i class="fa fa-envelope"></i>
 		<a href="mailto:up201305642@fe.up.pt">up201305642@fe.up.pt</a>
-	</span>
-	<p>The list of groups will be published shortly</p>
-</div>
+	</div>
+	</li>
+</ul>
 </div>
 </div>
 <?

@@ -1,8 +1,8 @@
 <?
-	if(!isset($_SESSION)){
-		session_start();
-	}
-	include('database/session.php');
+if(!isset($_SESSION)){
+	session_start();
+}
+include('database/session.php');
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,7 +37,7 @@ $(function() {
 	var document_window = $(window);
 
 	document_window.scroll(function(){
-		if (document_window.scrollTop() > header_height) {
+		if (document_window.scrollTop() >= header_height) {
 		   header_navigation.addClass('fixed-header');
 		}
 		else {
@@ -61,7 +61,7 @@ $(function() {
 <ul class="menu horizontal">
 	<li id="nav_index"><a href="index.php"><i class="fa fa-home"></i></a></li>
 	<li id="nav_browse">
-		<a href="#"><i class="fa fa-search"></i> Browse Events</a>
+		<a href="event_search.php"><i class="fa fa-search"></i> Browse Events</a>
 		<ul class="submenu">
 			<li><a href="event_search.php"><strong>Advanced Search</strong></a></li>
 			<li><a href="event_browse.php?tp=name">Sort By Name</a></li>
@@ -72,19 +72,19 @@ $(function() {
 	</li>
 	<li id="nav_events"><a href="manage_events.php"><i class="fa fa-gears"></i> Manage Events</a></li>
 	<li id="nav_forum"><a href="forum.php"><i class="fa fa-comment"></i> Forum</a></li>
-	<div class="push-right fw-300">
+	<div class="push-right menu-right fw-300">
 		<li class="align-right" id="nav_profile">
 		<?if(isset($_SESSION['username'])){?>
-			<a><i class="fa fa-user"></i> <?=$_SESSION['username']?></a>
-			<ul class="submenu all-100">
-				<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>
-				<?if($numberInvites>0){?>
-					<li><strong><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></strong></li>
-				<?}else{?>
-					<li><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></li>
-				<?}?>
-				<li><a href="action_logout.php">Logout</a></li>
-			</ul>
+		<a><i class="fa fa-user"></i> <?=$_SESSION['username']?></a>
+		<ul class="submenu">
+			<li><a href="view_profile.php?id=<?=$_SESSION['userid']?>">My Profile</a></li>
+			<?if($numberInvites>0){?>
+			<li><strong><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></strong></li>
+			<?}else{?>
+			<li><a href="manage_invites.php">My Invites (<?=$numberInvites?>)</a></li>
+			<?}?>
+			<li><a href="logout.php">Logout</a></li>
+		</ul>
 		<?}else{?>
 		<a href="login.php"><i class="fa fa-user"></i> Login</a>
 		<?}?>

@@ -69,12 +69,15 @@
 	</div>
 </div>
 <?}else{?>
-<script src="https://maps.googleapis.com/maps/api/js"></script>
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-565c6b43113a666a" async="async"></script>
+<script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-565c6b43113a666a" async="async"></script>
+<script src="js/gmaps.min.js"></script>
+<script src="view_event.js"></script>
 <script>
 var startId=0;
 var numberComments=<?=$numberComments?>;
+
 function fetchComments(div, elem){
+
 	$.ajax({
 		type: 'post',
 		url: 'list_comments.php',
@@ -103,28 +106,52 @@ function fetchComments(div, elem){
 		}
 	});
 }
+
 $(function() {
+
+	var buttonAccept = $('button#accept-button');
+	var buttonReject = $('button#reject-button');
+	var buttonFollow = $('a#follow-button');
+	var buttonComment = $('a#comment-button');
+	//===========================================
+	var buttonDelete = $('li#button-delete');
+	var buttonInvite = $('li#button-invite');
+	var buttonUpdate = $('li#button-update');
+	//===========================================
+	var labelDelete = $('span#label-delete');
+	var labelInvite = $('span#label-invite');
+	var labelUpdate = $('span#label-update');
+	//===========================================
+	var navigationBrowse = $('#nav_browse');
 	var commentsForm = $('#write-comment');
 	var commentsSection = $('#comment-section');
 	var expandComments = $('#expand-comments');
-	var commentButtonLabel = $("span#comment-text");
-	var followButtonLabel =$("span#follow-text");
-	$('#nav_browse').addClass('active');
+	//===========================================
 
+	navigationBrowse.addClass('active');
 	commentsForm.hide();
-	commentButtonLabel.hide();
-	followButtonLabel.hide();
 	fetchComments(commentsSection, expandComments);
+
 	expandComments.click(function(evt){
-		fetchComments($('#comment-section'), $(this));
+		fetchComments(commentsSection, $(this));
 	});
 
-	$("#follow-button").hover(function(){
-		followButtonLabel.stop(true,true).fadeToggle('fast');
+
+	buttonInvite.hover(function(){
+		labelInvite.stop(true,true).fadeToggle('fast');
+	});
+
+	buttonUpdate.hover(function(){
+		labelUpdate.stop(true,true).fadeToggle('fast');
+	});
+
+	buttonDelete.hover(function(){
+		labelDelete.stop(true,true).fadeToggle('fast');
 	});
 
 	<?if($canFollow){?>
-	$('a#follow-button').click(function(evt){
+
+	buttonFollow.click(function(evt){
 		if ($(evt.target).parent().hasClass('active')) {
 			targetPage = 'actions/action_unfollow.php';
 		}
@@ -150,7 +177,7 @@ $(function() {
 	});
 	<?}?>
 
-	$('#accept-button').click(function() {
+	buttonAccept.click(function() {
 		$.ajax({
 			type: 'post',
 			url: 'actions/action_invite_accept.php',
@@ -168,7 +195,8 @@ $(function() {
 			}
 		});
 	});
-	$('#reject-button').click(function() {
+
+	buttonReject.click(function() {
 		$.ajax({
 			type: 'post',
 			url: 'actions/action_invite_reject.php',
@@ -186,58 +214,48 @@ $(function() {
 			}
 		});
 	});
-	$('#comment-button').click(function() {
+
+	buttonComment.click(function() {
 		if (!$(this).parent().hasClass("disabled")) {
 			commentsForm.slideToggle('fast');
 			$(this).parent().toggleClass('active');
 		}
 	});
 });
-
-google.maps.event.addDomListener(window, 'load', function() {
-	var map = new google.maps.Map(document.getElementById('map-location'), {
-		center: {lat: 0, lng: 0},
-		disableDefaultUI: true,
-		zoomControl: true,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	});
-
-	var geocoder = new google.maps.Geocoder();
-	var infowindow = new google.maps.InfoWindow;
-	var locationString = $('a#location-link');
-	var mapContainer = $('div#map-container');
-	var marker = null;
-	var latlngStr = locationString.text().split(',', 2);
-	var latlng = {
-		lat:parseFloat(latlngStr[0]),
-		lng:parseFloat(latlngStr[1])
-	};
-
-	mapContainer.hide();
-	geocoder.geocode({'location':latlng}, function(results, status) {
-		if (status === google.maps.GeocoderStatus.OK && results[1]) {
-			marker = new google.maps.Marker({position:latlng,map:map});
-			map.setZoom(16);
-			infowindow.setContent('<b>' + results[1].formatted_address + "</b><p>" + marker.getPosition().toString() + '</p>');
-			locationString.text(results[1].formatted_address);
-		}
-		google.maps.event.addListener(marker, 'click', function(event) {
-			infowindow.open(map,marker);
-		});
-	});
-
-	locationString.click(function() {
-		mapContainer.slideToggle('fast', function() {
-			if (mapContainer.is(":visible")) {
-				google.maps.event.trigger(map, 'resize');
-				map.setCenter(marker.getPosition());
-				infowindow.open(map, marker);
-			}
-		});
-	});
-});
 </script>
-<div class="ink-grid push-center all-70 large-75 medium-80 small-90 tiny-100">
+
+<div class="ink-grid push-center all-70 large-80 medium-90 small-100 tiny-100">
+
+
+	<!-- BEGIN EVENT TITLE -->
+	<div class="push-left half-vertical-space">
+	<?if($isOwner){?>
+	<nav class="ink-navigation half-top-space">
+		<ul class="unstyled pills">
+			<li id="button-update"><a href="event_update.php?id=<?=$eventId?>">
+				<i class="fa fa-edit"></i>
+				<span class="hidden" id="label-update">Update Event</span>
+			</a></li>
+			<?if($canFollow){?>
+			<li id="button-invite"><a href="invite_users.php?id=<?=$eventId?>">
+			<?}else{?>
+			<li class="disabled" id="button-invite"><a>
+			<?}?>
+				<i class="fa fa-user-plus"></i>
+				<span class="hidden" id="label-invite">Invite Users</span>
+			</a></li>
+			<li id="button-delete"><a href="event_delete.php?id=<?=$eventId?>">
+				<i class="fa fa-trash"></i>
+				<span class="hidden" id="label-delete">Delete Event</span>
+			</a></li>
+		</ul>
+	</nav>
+	<?}?>
+	<h1 class="slab no-margin"><?=$thisEvent['name']?></h1>
+	<h5 class="slab no-margin"><?=$thisEvent['type']?></h5>
+	</div>
+	<!-- END EVENT TITLE -->
+
 
 	<!-- BEGIN USER AVATAR -->
 	<div class="panel push-right">
@@ -248,34 +266,18 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<!-- END USER AVATAR -->
 
 
-	<!-- BEGIN EVENT TITLE -->
-	<div class="push-left half-vertical-space">
-		<h1 class="slab no-margin"><?=$thisEvent['name']?></h1>
-		<h5 class="slab no-margin"><?=$thisEvent['type']?></h5>
-
+	<!-- BEGIN SHARE BUTTONS -->
+	<?if($loggedIn){?>
+	<div class="clear addthis_sharing_toolbox">
 	</div>
-	<!-- END EVENT TITLE -->
-<div class="clear addthis_sharing_toolbox"></div>
-
-	<!-- BEGIN EVENT MANAGEMENT -->
-	<?if($isOwner) {?>
-	<nav id="#nav" class="ink-navigation clear">
-		<ul class="pills">
-			<!-- check if user is already participating on the event -->
-			<li><a href="event_update.php?id=<?=$eventId?>"><i class="fa fa-edit"></i></a></li>
-			<li><a href="invite.php"><i class="fa fa-user-plus"></i></a></li>
-			<li><a href="event_delete.php?id=<?=$eventId?>"><i class="fa fa-trash"></i></a></li>
-		</ul>
-	</nav>
 	<?}?>
-	<!-- END EVENT MANAGEMENT -->
+	<!-- END SHARE BUTTONS -->
 
 
 	<!-- BEGIN EVENT DATE -->
 	<div class="clear half-vertical-space">
 		<p class="no-margin fw-medium">
-			<i class="fa fa-calendar"></i>
-			<b>Date:</b>
+			<i class="fa fa-calendar"></i><b>&nbsp;Date:</b>
 			<?=events_getDate($thisEvent)?>
 		</p>
 	</div>
@@ -295,8 +297,7 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<!-- BEGIN EVENT LOCATION -->
 	 <div class="half-vertical-space">
 		<p class="no-margin fw-medium">
-			<i class="fa fa-globe"></i>
-			<b>Location:</b>
+			<i class="fa fa-globe"></i><b>&nbsp;Location:</b>
 			<a id="location-link"><?=$thisEvent['location']?></a>
 		</p>
 	</div>
@@ -312,18 +313,12 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 	<!-- BEGIN INVITE PANEL -->
 	<?if($wasInvited){?>
-	<div class="panel all-100 bottom-padding">
-		<span>
-			<a href="<?=users_viewProfile($sender)?>"><?=$sender['username']?></a> invited you to this event.
-		</span>
-		<div class="push-right">
-			<small>
-				<button id="accept-button" class="ink-button"><i class="fa fa-thumbs-up"></i> Accept</button>
-			</small>
-			<small>
-				<button id ="reject-button" class="ink-button"><i class="fa fa-ban"></i> Decline</button>
-			</small>
-		</div>
+	<div class="panel all-100">
+		<a href="<?=users_viewProfile($sender)?>"><?=$sender['username']?></a> invited you to this event.
+		<small class="push-right">
+			<button id="accept-button" class="ink-button"><i class="fa fa-thumbs-up"></i> Accept</button>
+			<button id ="reject-button" class="ink-button"><i class="fa fa-ban"></i> Decline</button>
+		</small>
 	</div>
 	<?}?>
 	<!-- END INVITE PANEL -->
@@ -346,19 +341,11 @@ google.maps.event.addDomListener(window, 'load', function() {
 			</a>
 		</li>
 		<?if($isParticipating){?>
-			<li><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> 
-			<span id="comment-text">Comment</span>
-			</a></li>
+			<li><a id="comment-button" href="#write-comment"><i class="fa fa-comment"></i> Comment</a></li>
 		<?}else{?>
-			<li class="disabled"><a id="comment-button"><i class="fa fa-comment"></i> 
-			<span id="comment-text">Comment</span>
-			</a></li>
+			<li class="disabled"><a id="comment-button"><i class="fa fa-comment"></i> Comment</a></li>
 		<?}?>
-		<?if($isParticipating){?>
-			<li><a href="#"><i class="fa fa-upload"></i> Upload Photos</a></li>
-		<?}else{?>
-			<li class="disabled"><a href="#nav"><i class="fa fa-upload"></i> Upload Photos</a></li>
-		<?}?>
+
 		</ul>
 	</nav>
 	<?}?>
@@ -427,6 +414,6 @@ google.maps.event.addDomListener(window, 'load', function() {
 	<!-- END WRITE COMMENT SECTION -->
 </div>
 <?
-	}
+}
 	include('template/footer.php')
 ?>

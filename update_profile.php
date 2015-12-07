@@ -5,7 +5,6 @@
 	include('template/header.php');
 
 	$field = safe_getId($_GET, 'field');
-	$nextId = users_getNextId() + 1;
 	$thisUser = $defaultUser;
 	$userId = 0;
 
@@ -19,13 +18,12 @@
 
 	$thisError = safe_getId($_GET, 'error');
 	$splitName = explode(" ", $thisUser['name']);
-?>
 
-<?if($loggedIn){?>
+	if($loggedIn) {
+?>
+<script src="js/imgcentering.min.js"></script>
+<script src="upload_photo.js"></script>
 <script>
-var wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
-var fileInput = $('#file-input').wrap(wrapper);
-var userCountry = "<?=$thisUser['country']?>";
 $(function(){
 	$('#nav_profile').addClass('active');
 	$("#country-list option").remove();
@@ -33,105 +31,13 @@ $(function(){
 		$.each(data, function(index, item) {
 			$("#country-list").append($("<option></option>").text(item).val(index));
 		});
-		$("#country-list").val(userCountry).change();
+		$("#country-list").val('<?=$thisUser['country']?>').change();
 	});
-
-	wrapper = $('<div/>').css({height:0,width:0,'overflow':'hidden'});
-	fileInput = $('#file-input');
-/*	fileInput.change(function(){
-		$.ajax({
-		type: 'post',
-		url: 'actions/action_upload_photo.php',
-		data: {
-				'source': 'user',
-				'idUser': <?=$nextId?>
-		},
-		contentType: false,
-		cache: false,
-		processData: false,
-		success: function(destination) {
-			if (destination == window.location.pathname) {
-				window.location.reload();
-			}
-			else {
-				window.location = destination;
-			}
-		}
-		});
-	})*/
 });
-
-function readURL(input) {
-
-	if (input.files && input.files[0]) {
-		var goUpload = true;
-		var uploadFile = input.files[0];
-
-		if (!(/\.(bmp|gif|jpg|jpeg|png)$/i).test(uploadFile.name)) {
-			fileInput.effect("shake");
-			fileInput.text('You must select an image file only');
-				console.log("here2");
-			setTimeout(function() {
-				fileInput.text('Choose an avatar...');
-			} ,5000);
-
-			return false;
-		}
-			console.log("here3");
-		if (uploadFile.size > 2000000) { // 2mb
-		   fileInput.text('Please upload a smaller image, max size is 2 MB');
-
-			setTimeout(function() {
-				fileInput.text('Choose an avatar...');
-			}, 5000);
-
-			return false;
-		}
-
-		fileInput.text("Uploading "+uploadFile.name);
-
-		var reader = new FileReader();
-
-		reader.onload = function (e) {
-
-			$('img#blah').attr('src', e.target.result);
-
-			var width = $('#blah').width(); // Current image width
-			var height = $('#blah').height(); // Current image height
-
-			if (width > 200 || height > 200) {
-
-				var newHeight = 120 * (height / width);
-				var newWidth = 120 * (width / height);
-
-				if (width > height) {
-					$('img#blah').css("width", newWidth + 'px'); // set new width
-					$('img#blah').css("height", '120px'); // scale height based on ratio
-				}
-				else if (height > width) {
-					$('img#blah').css("height", newHeight + 'px'); // set new width
-					$('img#blah').css("width", '120px'); // scale height based on ratio
-				}
-
-				fileInput.text(uploadFile.name);
-			}
-			else {
-				fileInput.text("Minimum file size: 120x120px");
-
-				setTimeout(function() {
-					fileInput.text('Choose file');
-				}, s5000);
-			}
-		}
-
-		reader.readAsDataURL(uploadFile);
-	}
-}
 </script>
-
-<div class="ink-grid push-center all-50 large-60 medium-80 small-100 tiny-100">
-<div class="column all-100 gutters">
-	<form action="actions/action_update_user.php" method="post" enctype="multipart/form-data" class="ink-form all-75 push-center ink-formvalidator">
+<div class="ink-grid push-center all-60 large-80 medium-100 small-100 tiny-100">
+<div class="column all-100">
+	<form action="actions/action_update_user.php" method="post" enctype="multipart/form-data" class="ink-form all-80 small-100 tiny-100 push-center ink-formvalidator">
 		<input name="field" type="hidden" value="<?=$field?>">
 		<input name="idUser" type="hidden" value="<?=$userId?>">
 		<fieldset>
@@ -146,12 +52,12 @@ function readURL(input) {
 			<?}else if($field==4){?>
 				<legend class="align-center">Change Location</legend>
 			<?}?>
-			
+
 			<?if($thisError==1){?>
 			<div class="ink-alert basic error">
 				<p><b>Error:</b> you must enter your current password as the old password!</p>
 			</div>
-			<?}else if($thisError==2){?>			
+			<?}else if($thisError==2){?>
 			<div class="ink-alert basic error">
 				<p><b>Error:</b> new and confirmation passwords don't match!</p>
 			</div>
@@ -163,29 +69,29 @@ function readURL(input) {
 
 			<!-- BEGIN UPDATE PASSWORD -->
 			<?if($field==1){?>
-			<div class="control-group required column-group half-gutters">	
-				<label for="current-password" class="align-right all-30">Old Password: </label>
-				<div class="control append-symbol all-70">				
+			<div class="control-group required column-group half-gutters">
+				<label for="current-password" class="align-right all-35 small-45 tiny-45">Old Password: </label>
+				<div class="control append-symbol all-65 small-55 tiny-55">
 					<span>
-						<input name="current-password" id="curr-password" type="password" data-rules="required" placeholder="Please enter your password">
+						<input name="current-password" id="current-password" type="password" data-rules="required" placeholder="Please enter your current password">
 						<i class="fa fa-key"></i>
 					</span>
 				</div>
 			</div>
-			<div class="control-group required column-group half-gutters">	
-				<label for="next-password" class="align-right all-30">New Password: </label>
-				<div class="control append-symbol all-70">		
+			<div class="control-group required column-group half-gutters">
+				<label for="next-password" class="align-right all-35 small-45 tiny-45">New Password: </label>
+				<div class="control append-symbol all-65 small-55 tiny-55">
 					<span>
-						<input name="next-password" id="next-password" type="password" data-rules="required|min_length[8]" placeholder="Please enter your password">
+						<input name="next-password" id="next-password" type="password" data-rules="required|min_length[8]" placeholder="Please enter your new password">
 						<i class="fa fa-key"></i>
 					</span>
 				</div>
 			</div>
-			<div class="control-group required column-group half-gutters">	
-				<label for="confirm-password" class="align-right all-30">Confirm Password: </label>
-				<div class="control append-symbol all-70">			
+			<div class="control-group required column-group half-gutters">
+				<label for="confirm-password" class="align-right all-35 small-45 tiny-45">Confirm Password: </label>
+				<div class="control append-symbol all-65 small-55 tiny-55">
 					<span>
-						<input name="confirm-password" id="confirm-password" type="password" data-rules="required|min_length[8]" placeholder="Please enter your password">
+						<input name="confirm-password" id="confirm-password" type="password" data-rules="required|min_length[8]" placeholder="Please confirm your new password">
 						<i class="fa fa-key"></i>
 					</span>
 				</div>
@@ -213,7 +119,7 @@ function readURL(input) {
 			<?}else if($field==3){?>
 			<div class="control-group required column-group half-gutters">
 				<label for="email" class="all-20 align-right">E-mail:</label>
-				<div class="control append-symbol all-80">
+				<div class="control append-symbol all-70">
 					<span>
 					<input type="text" name="email" value="<?=$thisUser['email']?>" data-rules="required|email">
 					<i class="fa fa-envelope-o"></i>
@@ -243,19 +149,20 @@ function readURL(input) {
 
 			<!-- BEGIN UPDATE AVATAR -->
 			<?}else if($field==5){?>
-			<div id="blah" class="padding double-vertical-space all-30 align-center small-100 tiny-100">
-				<img id="blah" src="holder.js/200x200/auto/ink" alt="">
-				<div class="ink-alert basic">
-				 <p><b>Warning:</b> avatar size must not exceed 200 000 bytes!</p>
-				</div>
+			<div class="ink-alert basic">
+			 	<p><b>Warning:</b> avatar size must not exceed 200 000 bytes!</p>
 			</div>
 			<div class="control-group column-group half-gutters">
-				<label for="file-input" class="all-25 align-right">Avatar:</label>
-				<input type="hidden" name="idUser" value="<?=$nextId?>">
+				<input type="hidden" name="idUser" value="<?=$userId?>">
+				<label for="image" class="all-25 align-right">Avatar:</label>
 				<div class="control all-75">
 					<div class="input-file">
-						<input type="file" name="userfile" id="file-input">
+						<input type="file" name="image" id="image">
 					</div>
+				</div>
+				<label for="avatar-parent" class="all-25 align-right half-right-space">Preview:</label>
+				<div id="avatar-parent" class="thumb">
+					<img id="avatar" src="<?=users_getAvatar($thisUser)?>">
 				</div>
 			</div>
 			<?}?>

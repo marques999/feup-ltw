@@ -10,7 +10,7 @@
 	if (safe_check($_POST, 'idUser') && $loggedIn) {
 
 		$success = false;
-		$userId = intval($_POST['idUser']);
+		$userId = safe_getId($_POST['idUser']);
 		$userExists = users_idExists($userId);
 
 		if ($userId > 0 && $userExists && $thisUser == $userId) {

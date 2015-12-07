@@ -8,7 +8,7 @@
 	include_once('../database/users.php');
 	include_once('../database/session.php');
 
-	if (safe_check($_POST, 'idUser') && safe_check($_POST, 'idThread')) {
+	if (safe_check($_POST, 'idUser') && safe_check($_POST, 'idThread') && safe_check($_POST, 'message')) {
 		$thisThread = safe_getId($_POST, 'idThread');
 		$thisParticipant = safe_getId($_POST, 'idUser');
 		$userExists = users_idExists($thisParticipant);

@@ -22,6 +22,18 @@
 	font-weight: 900;
 }
 
+.small {
+	font-size: .75em;
+}
+
+.medium {
+	font-size: .85em;
+}
+
+.large {
+	font-size: 1.2em;
+}
+
 .condensed-300, .condensed-thin {
 	font-weight: 300;
 	font-family: Roboto_condensed, Arial, Helvetica, sans-serif;
@@ -65,18 +77,10 @@
 	font-family: Times, "Times New Roman", serif;
 }
 
-.monospace {
-	font-family: Monaco, "Andale Mono", "Courier New", monospace;
-}
-
 .condensed {
 	font-family: Roboto_condensed, Arial, Helvetica, sans-serif;
 }
 
 .slab {
 	font-family: Roboto_slab, Arial, Helvetica, sans-serif;
-}
-
-.italic {
-	font-style: italic;
 }

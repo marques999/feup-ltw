@@ -5,14 +5,24 @@
 		'title' => 'Sample Post',
 		'hits' => 1,
 		'message' => 'QWERTYUIOP :)',
+		'timestamp' => 0
+	);
+
+	$defaultPost = array(
+		'idPost' => 0,
+		'idThread' => 0,
+		'idUser' => 0,
+		'message' => 'QWERTYUIOP :)',
 		'timestamp' => 0,
+		'idQuote' => 0
 	);
 
 	$stmt = $db->prepare('SELECT ForumPost.*, username FROM ForumPost JOIN Users ON Users.idUser = ForumPost.idUser');
 	$stmt->execute();
 	$allPosts = array();
+	$allPosts[0] = $defaultPost;
 
-	while(($result = $stmt->fetch()) != null) {
+	while (($result = $stmt->fetch()) != null) {
 		$allPosts[$result['idPost']] = $result;
 	}
 
@@ -45,30 +55,37 @@
 	}
 
 	function forum_printPost($currentPost, $thisThread) {
+
 		global $allPosts;
 
 		if(isset($currentPost['idQuote'])){
-		$quoteId=$currentPost['idQuote'];
-		$validReference=false;
-		if ($quoteId==0) {
-			$quotedPost = $thisThread;
-		}
-		else if (isset($allPosts[$quoteId])){
-			$quotedPost=$allPosts[$quoteId];
-			$validReference=true;
-		}
-		if($validReference){?>
-		<p class="half-vertical-space">
-			<small class="no-margin"><?=$quotedPost['username']?> wrote:</small>
-			<blockquote class="no-margin">
-				<?forum_printPost($quotedPost, $thisThread)?>
-			</blockquote>
-		</p>
+
+			$quoteId=$currentPost['idQuote'];
+			$validReference=false;
+
+			if ($quoteId == 0) {
+				$quotedPost = $thisThread;
+				$validReference = true;
+			}
+			else if (isset($allPosts[$quoteId])) {
+				$quotedPost = $allPosts[$quoteId];
+				$validReference = true;
+			}
+
+			if($validReference){?>
+			<p class="half-vertical-space">
+				<small class="no-margin"><?=$quotedPost['username']?> wrote:</small>
+				<blockquote class="no-margin">
+					<?forum_printPost($quotedPost, $thisThread)?>
+				</blockquote>
+			</p>
+			<?}?>
 		<?}?>
-		<?}?>
+
 		<?if($currentPost==null){
 			$postMessage=preg_split('/\r\n|\r|\n/', parseEmoticons($thisThread['message']));
-		}else{
+		}
+		else{
 			$postMessage=preg_split('/\r\n|\r|\n/', parseEmoticons($currentPost['message']));
 		}
 		foreach($postMessage as $line){?>
@@ -108,12 +125,14 @@
 
 	function forum_allThreads() {
 		global $db;
-		$stmt = $db->prepare('SELECT ForumThread.*,
-			MAX(ForumThread.timestamp + ForumPost.timestamp) AS last
-			FROM ForumThread JOIN ForumPost
+		$stmt = $db->prepare('SELECT ForumThread.*, MAX(ForumPost.timestamp) AS last
+			FROM ForumThread
+			LEFT JOIN ForumPost
 			ON ForumPost.idThread = ForumThread.idThread
 			GROUP BY ForumThread.idThread
-			ORDER BY last DESC');
+			ORDER BY CASE WHEN last IS NULL
+			THEN ForumThread.timestamp
+			ELSE last END DESC');
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -125,7 +144,7 @@
 		$stmt->execute();
 		$allThreads = array();
 
-		while(($result = $stmt->fetch()) != null) {
+		while (($result = $stmt->fetch()) != null) {
 			$allThreads[$result['idThread']] = $result['count'];
 		}
 
@@ -139,7 +158,7 @@
 		$stmt->execute();
 		$allThreads = array();
 
-		while(($result = $stmt->fetch()) != null) {
+		while (($result = $stmt->fetch()) != null) {
 			$allThreads[$result['idThread']] = $result;
 		}
 
@@ -188,7 +207,7 @@
 		$stmt->execute();
 		$allPosts = array();
 
-		while(($result = $stmt->fetch()) != null) {
+		while (($result = $stmt->fetch()) != null) {
 			$allPosts[$result['idPost']] = $result;
 		}
 

@@ -3,15 +3,13 @@
 	include_once('database/users.php');
 	include('template/header.php');
 
-	$thisError=safe_getId($_GET,'error');
+	$thisError = safe_getId($_GET, 'error');
 ?>
-
 <script>
 $(function(){
 	$('#nav_profile').addClass('active');
 });
 </script>
-
 <?if(!$loggedIn){?>
 <div class="ink-grid push-center all-40 large-60 medium-80 small-100 tiny-100">
 <form action="actions/action_login.php" method="post" class="ink-form ink-formvalidator">
@@ -54,7 +52,7 @@ $(function(){
 </form>
 </div>
 <?}else{
-	include_once('message_logout.php');
+	header('Location: logout.php');
 }
 include('template/footer.php');
 ?>

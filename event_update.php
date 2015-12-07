@@ -9,7 +9,7 @@
 	$ownEvent = false;
 	$eventId = safe_getId($_GET, 'id');
 
-	if ($loggedIn) {	
+	if ($loggedIn) {
 		$getEvent = events_listById($eventId);
 		if (count($getEvent) > 0) {
 			$thisEvent = $getEvent[0];
@@ -18,22 +18,25 @@
 	}
 
 	$formattedDate = gmdate("Y-m-d", $thisEvent['date']);
+	$temporaryDate = gmstrftime("%H:%M", $thisEvent['date']);
+	$dateArray = strptime($temporaryDate, "%H:%M");
 ?>
-
 <script>
 $(function(){
 	$('#nav_events').addClass('active');
 });
 </script>
-
 <?if($loggedIn && $ownEvent){?>
-<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script src="js/gmaps.min.js"></script>
+<script src="js/imgcentering.min.js"></script>
+<script src="event_update.js"></script>
+<script src="upload_photo.js"></script>
 <script>
 $(function(){
 	currentTime = new Date();
 	comboTypes = $("select#type");
 	customType = $("input#custom-type").hide();
-	eventTypes = {};	
+	eventTypes = {};
 	comboTypes.change(function() {
 		if(comboTypes.val() == 'Other') {
 			customType.attr('data-rules', 'required');
@@ -56,7 +59,7 @@ $(function(){
 		});
 
 		thisEventType = '<?=$thisEvent['type']?>';
-		
+
 		if (eventTypes[thisEventType] != undefined) {
 			comboTypes.val(thisEventType).change();
 		}
@@ -66,57 +69,19 @@ $(function(){
 		}
 	});
 });
-
-google.maps.event.addDomListener(window, 'load', function() {
-
-	var defaultMarker = new google.maps.Marker({
-		map: gmaps_map,
-		position: {'lat': 44.5403, 'lng': -78.5463}
-	});
-
-	var gmaps_map = new google.maps.Map(document.getElementById('location-map'), {
-		zoom: 15,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	});
-
-	var geocoder = new google.maps.Geocoder();
-	var locationString = $("input#location");
-	var marker = null;
-
-	locationString.keydown(function(event) {
-		
-		if (event.keyCode == 13 || event.which == 13) {
-			
-			geocoder.geocode({'address':locationString.val()}, function(results, status) {
-				
-				if (status == google.maps.GeocoderStatus.OK) {
-					marker = new google.maps.Marker({map:gmaps_map,position:results[0].geometry.location});
-					gmaps_map.setCenter(marker.getPosition());
-					locationString.val(results[0].geometry.location);
-				}
-			});
-
-			event.preventDefault();
-		}
-	});
-
-	startEvent = $.Event('keydown');
-	startEvent.which = 13;
-	locationString.trigger(startEvent);
-});
 </script>
-
 <div class="ink-grid all-100">
-<div class="column-group gutters">
-	<form action="actions/action_update_event.php" method="post" class="ink-form ink-formvalidator all-60 small-100 tiny-100">
+<div class="column-group">
+	<form action="actions/action_update_event.php" method="post" enctype="multipart/form-data" class="ink-formvalidator all-50 medium-60 small-100 tiny-100">
 		<fieldset>
+			<input type="hidden" name="idEvent" id="idEvent" value="<?=$eventId?>">
 			<legend class="align-center">Update Event</legend>
 
 			<!-- BEGIN EVENT NAME -->
 			<div class="control-group required column-group half-gutters">
-				<label for="name" class="all-30 align-right">Name:</label>
-				<div class="control all-60">
-					<input name="name" id="name" type="text" value=" <?=$thisEvent['name']?>" data-rules="required">
+				<label for="name" class="all-20 align-right">Name:</label>
+				<div class="control all-80">
+					<input name="name" id="name" type="text" value="<?=$thisEvent['name']?>" data-rules="required|text[true,true]" placeholder="Please enter the event name">
 				</div>
 			</div>
 			<!-- END EVENT NAME -->
@@ -124,9 +89,9 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 			<!-- BEGIN EVENT DESCRIPTION -->
 			<div class="control-group required column-group half-gutters">
-				<label for="description" class="all-30 align-right">Description:</label>
-				<div class="control all-60">
-					<textarea name="description" rows="8" cols="60" data-rules="required"><?=$thisEvent['description']?></textarea>
+				<label for="description" class="all-20 align-right">Description:</label>
+				<div class="control all-80">
+					<textarea name="description" rows="8" cols="60" data-rules="required" placeholder="Please enter the event description"><?=$thisEvent['description']?></textarea>
 				</div>
 			</div>
 			<!-- END EVENT DESCRIPTION -->
@@ -134,10 +99,10 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 			<!-- BEGIN EVENT LOCATION -->
 			<div class="control-group required column-group half-gutters">
-				<label for="location" class="all-30 align-right">Location:</label>
-				<div class="control append-symbol all-60">
+				<label for="location" class="all-20 align-right">Location:</label>
+				<div class="control append-symbol all-80">
 					<span>
-					<input type="text" value="<?=$thisEvent['location']?>" id="location" data-rules="required">
+					<input type="text" id="location" name="location" value="<?=$thisEvent['location']?>" data-rules="required">
 					<i class="fa fa-globe"></i>
 					</span>
 				</div>
@@ -147,12 +112,12 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 			<!-- BEGIN EVENT TYPE -->
 			<div class="control-group required column-group half-gutters">
-				<label for="type" class="all-30 align-right">Type:</label>
-				<div class="control all-30">
+				<label for="type" class="all-20 align-right">Type:</label>
+				<div class="control all-40">
 					<select name="type" id="type">
 					</select>
 				</div>
-				<div class="control all-30">
+				<div class="control all-40">
 					<input type="text" id="custom-type" name="custom-type">
 				</div>
 			</div>
@@ -160,28 +125,27 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 
 			<!-- BEGIN EVENT DATE -->
-			<?$dateArray=getdate($thisEvent['date']);?>
 			<div class="control-group required column-group half-gutters">
-				<label for="date" class="all-30 align-right">Date/Time</label>
-		        <div class="control all-40">
-		            <input name="date" id="date" type="text" data-format="d-m-Y" />
+				<label for="date" class="all-20 align-right">Date/Time</label>
+		        <div class="control all-50">
+		            <input name="date" id="date" type="text" data-rules="required" data-format="d-m-Y" />
 		        </div>
-		        <div class="control all-10">
-		       		<input name="hours" id="hours" type="number" value="<?=$dateArray['hours']?>">
+		        <div class="control all-15">
+		       		<input name="hours" id="hours" type="number" data-rules="integer|range[0,23]" value="<?=$dateArray['tm_hour']?>">
 		        </div>
-		        <div class="control all-10">
-		        	<input name="minutes" id="minutes" type="number" value="<?=$dateArray['minutes']?>">
+		        <div class="control all-15">
+		        	<input name="minutes" id="minutes" type="number" data-rules="integer|range[0,59]" value="<?=$dateArray['tm_min']?>">
 		        </div>
 		    </div>
 			<!-- END EVENT DATE -->
 
 
 			<!-- BEGIN EVENT PHOTOS -->
-			<div class="control-group column-group gutters">
-				<label for="file-input" class="all-30 align-right">Photo:</label>
-				<div class="control all-50">
+			<div class="control-group column-group half-gutters">
+				<label for="image" class="all-20 align-right">Photo:</label>
+				<div class="control all-80">
 					<div class="input-file">
-						<input type="file" name="" id="file-input">
+						<input type="file" name="image" id="image">
 					</div>
 				</div>
 			</div>
@@ -189,33 +153,21 @@ google.maps.event.addDomListener(window, 'load', function() {
 
 
 			<!-- BEGIN EVENT SUBMIT -->
-			<div class="control-group column-group gutters">
-				 <label for="" class="all-50 align-right"></label>
-				<div class="control all-20 align-right">
-					<input type="submit" name="sub" value="Submit" class="ink-button" />
-				</div>
+			<div class="control-group column-group half-gutters">
+				<p class="align-center">
+					<button type="submit" class="ink-button">Update</button>
+					<button type="reset" class="ink-button" onclick="history.go(-1)">Cancel</button>
+				</p>
 			</div>
 			<!-- END EVENT SUBMIT -->
 		</fieldset>
 	</form>
-	
-
-	<div class="padding all-40 align-center small-100 tiny-100">
-		
-
-		<!-- BEGIN EVENT PHOTO -->
-		<div class="vertical-space">
-			<img class="all-100" src="<?=events_getImage($thisEvent,'medium')?>">
+	<div class="padding align-center all-40 small-100 tiny-100">
+		<div id="avatar-parent" class="half-bottom-space">
+			<img id="avatar" class="all-100" src="<?=events_getImage($thisEvent,'medium')?>">
 		</div>
-		<!-- END EVENT PHOTO -->
-
-
-		<!-- BEGIN EVENT MAP -->
-		<div style="height:400px" class="control all-100" id="location-map">
+		<div class="gmaps control all-100" id="location-map">
 		</div>
-		<!-- END EVENT MAP -->
-
-
 	</div>
 </div>
 </div>

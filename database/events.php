@@ -14,7 +14,7 @@
 	$allEvents = array();
 	$allEvents[0] = $defaultEvent;
 
-	while(($result = $stmt->fetch()) != null) {
+	while (($result = $stmt->fetch()) != null) {
 		$allEvents[$result['idEvent']] = $result;
 	}
 
@@ -83,7 +83,7 @@
 		if (!is_array($eventData) || !isset($eventData['idEvent'])) {
 			$eventData = $defaultEvent;
 		}
-		
+
 		return gmdate("l, d/m/Y H:i", $eventData['date']);
 	}
 
@@ -95,39 +95,42 @@
 
 		$event_id = safe_getId($eventData, 'idEvent');
 
-		//return glob("img/events/$event_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
 		if ($imageSize == 'small') {
-			return "holder.js/200x128/auto/ink"; // tamanho pequeno
+			$smallLocation = glob("img/events/{$event_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE);
+			return $smallLocation != false ? $smallLocation[0] : "holder.js/200x128/auto/ink";
 		}
 
 		if ($imageSize == 'medium') {
-			return "holder.js/400x256/auto/ink"; // tamanho médio
+			$mediumLocation = glob("img/events/{$event_id}_medium.{jpg,jpeg,gif,png}", GLOB_BRACE);
+			return $mediumLocation != false ? $mediumLocation[0] : "holder.js/400x256/auto/ink";
 		}
 
-		return "holder.js/1200x580/auto/ink"; // amanho original
+		$originalLocation = glob("img/events/{$event_id}.{jpg,jpeg,gif,png}", GLOB_BRACE);
+		return $originalLocation != false ? $originalLocation[0] : "holder.js/1200x580/auto/ink";
 	}
 
 	function events_listParticipants($event_id) {
 		global $db;
 		$stmt = $db->prepare('SELECT Users.idUser, Users.username FROM Users
-								JOIN UserEvents ON UserEvents.idEvent = :idEvent
-								AND UserEvents.idUser = Users.idUser');
+			JOIN UserEvents ON UserEvents.idEvent = :idEvent
+			AND UserEvents.idUser = Users.idUser');
 		$stmt->bindParam(':idEvent', $event_id, PDO::PARAM_INT);
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
 
 	function events_countParticipants() {
+
 		global $db;
 		global $defaultEvent;
 		$stmt = $db->prepare('SELECT Events.idEvent, COUNT(UserEvents.idEvent) AS count FROM Events
-								LEFT JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
-								GROUP BY Events.idEvent');
+			LEFT JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
+			GROUP BY Events.idEvent');
 		$stmt->execute();
 		$eventList = array();
 		$eventList[0] = $defaultEvent;
 
-		while(($result = $stmt->fetch()) != null) {
+		while (($result = $stmt->fetch()) != null) {
 			$eventList[$result['idEvent']] = $result;
 		}
 
@@ -135,16 +138,17 @@
 	}
 
 	function events_countInvites() {
+
 		global $db;
 		global $defaultEvent;
 		$stmt = $db->prepare('SELECT Events.idEvent, COUNT(Invites.idEvent) AS count FROM Events
-				LEFT JOIN Invites ON Invites.idEvent = Events.idEvent
-				GROUP BY Events.idEvent');
+			LEFT JOIN Invites ON Invites.idEvent = Events.idEvent
+			GROUP BY Events.idEvent');
 		$stmt->execute();
 		$eventList = array();
 		$eventList[0] = $defaultEvent;
 
-		while(($result = $stmt->fetch()) != null) {
+		while (($result = $stmt->fetch()) != null) {
 			$eventList[$result['idEvent']] = $result;
 		}
 
@@ -160,13 +164,16 @@
 	}
 
 	function events_getNextId() {
+
 		global $db;
 		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Events'");
 		$stmt->execute();
 		$result = $stmt->fetch();
+
 		if ($result != false && is_array($result)) {
-			return $result['seq'];
+			return $result['seq'] + 1;
 		}
+
 		return -1;
 	}
 
@@ -179,7 +186,7 @@
 
 	function events_listTopEvents($top_n) {
 		global $db;
-		$stmt = $db->prepare('SELECT Events.*, COUNT(UserEvents.idUser) AS participants 
+		$stmt = $db->prepare('SELECT Events.*, COUNT(UserEvents.idUser) AS participants
 			FROM Events, UserEvents
 			WHERE Events.idEvent = UserEvents.idEvent
 			AND private = 0
@@ -198,102 +205,94 @@
 		return $stmt->fetchAll();
 	}
 
-		
 	function getEventsOrdered($type, $order, $curr_time) {
+
 		global $db;
-		
-		if($type == 'popularity') {
-			if($order == 1) {
+
+		if ($type == 'popularity') {
+			if ($order == 1) {
 				$stmt = $db->prepare("SELECT Events.*, COUNT(Events.idUser) AS following FROM Events
-										JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
-										AND Events.private = 0 AND :curr_time < Events.date 
-										GROUP BY UserEvents.idEvent
-										ORDER BY following DESC");
-			} 
+					JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
+					AND Events.private = 0 AND :curr_time < Events.date
+					GROUP BY UserEvents.idEvent
+					ORDER BY following DESC");
+			}
 			else {
 				$stmt = $db->prepare("SELECT Events.*, COUNT(Events.idUser) AS following FROM Events
-										JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
-										AND Events.private = 0 AND :curr_time < Events.date 
-										GROUP BY UserEvents.idEvent
-										ORDER BY following ASC");
+					JOIN UserEvents ON UserEvents.idEvent = Events.idEvent
+					AND Events.private = 0 AND :curr_time < Events.date
+					GROUP BY UserEvents.idEvent
+					ORDER BY following ASC");
 			}
 		}
 		else {
-			if($order == 1) {
+			if ($order == 1) {
 				$stmt = $db->prepare("SELECT * FROM Events WHERE private = 0 AND :curr_time < date ORDER BY $type DESC");
-			} 
+			}
 			else {
 				$stmt = $db->prepare("SELECT * FROM Events WHERE private = 0 AND :curr_time < date ORDER BY $type ASC");
 			}
 		}
-			
+
 		$stmt->bindParam(':curr_time', $curr_time, PDO::PARAM_INT);
 		$stmt->execute();
 
-		return $stmt->fetchAll();	
+		return $stmt->fetchAll();
 	};
-	
-	function dateQuerry($date_options) {
-		
+
+	function listFilteredEvents($name, $type, $date1, $date2, $date_options, $order, $orderBy) {
+
+		global $db;
+		$query = 'SELECT * FROM Events WHERE private = 0';
+
+		if ($name != '') {
+			$query .= " AND name LIKE '%{$name}%'";
+		}
+
+		if ($type != '') {
+			$query .= ' AND type = :type';
+		}
+
 		if ($date_options == 0) {
-			return ' AND date >= :date1';
+			$date1 = $date1 + 3600 * 24;
+			$query .= ' AND date >= :date1';
 		}
 		else if ($date_options == 1) {
-			return ' AND date < :date1';
-		}		
-		else if ($date_options == 3 || $date_options == 2) {
-			return ' AND date BETWEEN :date1 AND :date2';
-		}		
-
-		return '';
-	}
-	
-	function bindDateParams($date1, $date2, $date_options, $stmt) {
-
-		if($date_options == 3) {
-			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
-			$stmt->bindParam(':date2', $date2, PDO::PARAM_INT);			
+			$query .= ' AND date <= :date1';
 		}
-		if($date_options == 2) {
+		else if ($date_options == 3 || $date_options == 2) {
+			$date2 = $date2 + 3600 * 24;
+			$query .= ' AND date BETWEEN :date1 AND :date2';
+		}
+
+		if($order == 1) {
+			$query .= ' ORDER BY $orderBy DESC';
+		}
+		else {
+			$query .= ' ORDER BY $orderBy ASC';
+		}
+
+		$stmt = $db->prepare($query);
+
+		if($type != '') {
+			$stmt->bindParam(':type', $type, PDO::PARAM_STR);
+		}
+
+		if ($date_options == 3) {
+			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
+			$stmt->bindParam(':date2', $date2, PDO::PARAM_INT);
+		}
+		else if ($date_options == 2) {
 			$endOfDay = $date1 + 60*60*24;
 			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
-			$stmt->bindParam(':date2', $endOfDay, PDO::PARAM_INT);			
+			$stmt->bindParam(':date2', $endOfDay, PDO::PARAM_INT);
 		}
 		else if ($date_options >= 0) {
 			$stmt->bindParam(':date1', $date1, PDO::PARAM_INT);
 		}
-	}
-	
-	function listFilteredEvents($name, $type, $date1, $date2, $date_options, $order, $orderBy) {
-		$querry = 'SELECT * FROM Events WHERE private = 0';
-		if($name != '') {
-			$querry .= ' AND name = :name';
-		}
-		if($type != '') {
-			$querry .= ' AND type = :type';
-		}
-		
-		$querry .= dateQuerry($date_options);
-		
-		if($order == 1) {
-			$querry .=  ' ORDER BY $orderBy DESC';
-		}
-		else {
-			$querry .=  " ORDER BY $orderBy ASC";
-		}
-		
-		global $db;
-		$stmt = $db->prepare($querry);
-		
-		if($name != '') {		
-			$stmt->bindParam(':name', $name, PDO::PARAM_STR);
-		}
-		if($type != '') {
-			$stmt->bindParam(':type', $type, PDO::PARAM_STR);
-		}
-		bindDateParams($date1, $date2, $date_options, $stmt);
-		
+
 		$stmt->execute();
+
 		return $stmt->fetchAll();
 	};
 ?>

@@ -15,7 +15,7 @@
 		$isParticipating = users_isParticipating($thisParticipant, $thisEvent);
 		$userExists = users_idExists($thisParticipant);
 
-		if ($userExists && $isParticipating) {
+		if ($userExists && $isParticipating && safe_check($_POST, 'message')) {
 
 			$safeMessage = safe_trim($_POST['message']);
 			$stmt = $db->prepare('INSERT INTO Comments VALUES(NULL, :idUser, :idEvent, :timestamp, :message)');
@@ -36,6 +36,6 @@
 		}
 	}
 	else {
-		safe_redirect("../view_event.php?id=$thisEvent");
+		safe_redirect("../index.php");
 	}
 ?>

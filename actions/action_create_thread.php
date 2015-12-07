@@ -7,13 +7,13 @@
 	include_once('../database/forum.php');
 	include_once('../database/users.php');
 
-	if (safe_check($_POST, 'idUser') && isset($_POST['title']) && isset($_POST['message'])) {		
+	if (safe_check($_POST, 'idUser') && safe_check($_POST, 'title') && safe_check($_POST, 'message')) {
 		$thisAuthor = safe_getId($_POST, 'idUser');
 		$userExists = users_idExists($thisAuthor);
-		$currentTime = time();
 		$nextId = forum_getNextThread() + 1;
+		$currentTime = time();
 
-		if ($userExists) {		
+		if ($userExists) {
 			$safeTitle = safe_trim($_POST['title']);
 			$safeMessage = safe_trim($_POST['message']);
 			$stmt = $db->prepare('INSERT INTO ForumThread VALUES(NULL, :idUser, :title, "0", :message, :datetime)');
@@ -34,6 +34,6 @@
 		}
 	}
 	else {
-		safe_redirect("../forum.php");
+		safe_redirect("../index.php");
 	}
 ?>

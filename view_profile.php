@@ -23,7 +23,6 @@
 	$numberEvents = count($thisEvents);
 	$numberEventsCreated = count($ownEvents);
 ?>
-
 <?if($isOwner){?>
 <script>
 $(function(){
@@ -31,19 +30,22 @@ $(function(){
 });
 </script>
 <?}?>
-
-<div class="ink-grid push-center all-75 large-75 medium-100 small-90 tiny-100">
+<div class="ink-grid push-center all-80 large-90 medium-100 small-90 tiny-100">
 <div class="column-group gutters">
-
-
 	<!-- BEGIN USER AVATAR -->
 	<div class="all-30 large-40 medium-40 small-100 tiny-100">
-		<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
 		<?if($isOwner){?>
-		<p class="align-center quarter-vertical-space">
+		<a href="update_profile.php?field=5">
+			<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
+		</a>
+		<p class="align-center gutters quarter-vertical-space">
 			<a href="update_profile.php?field=1"><button class="ink-button"><i class="fa fa-key"></i> Change Password</button></a>
+		</p>
+		<p class="align-center gutters quarter-vertical-space">
 			<a href="delete_user.php?id=<?=$userId?>"><button class="ink-button"><i class="fa fa-user-times"></i> Delete Account</button></a>
 		</p>
+		<?}else{?>
+		<img class="all-100 half-padding" src="<?=users_getAvatar($thisUser)?>"/>
 		<?}?>
 	</div>
 	<!-- END USER AVATAR -->
@@ -53,7 +55,7 @@ $(function(){
 	<div class="column all-70 large-60 medium-60 small-100 tiny-100">
 	<h1 class="push-left"><?=$thisUser['username']?></h1>
 	<img class="push-left half-padding" src="<?=users_getCountryFlag($thisUser)?>"></img>
-	<p class="clear">
+	<div class="clear">
 	<?if($isOwner){?>
 		<a href="update_profile.php?field=2"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
@@ -67,7 +69,8 @@ $(function(){
 	<?if($isOwner){?>
 		<a href="update_profile.php?field=4"><i class="fa fa-plus-circle"></i></a>
 	<?}?>
-	<b>Location: </b><?=users_formatLocation($thisUser)?></p>
+		<b>Location: </b><?=users_formatLocation($thisUser)?>
+	</div>
 	<!-- END PROFILE INFORMATION -->
 
 
@@ -77,7 +80,7 @@ $(function(){
 	<?if($numberEvents>0){
 		foreach($thisEvents as $currentEvent){?>
 		<div class="half-vertical-space all-100">
-			<img src="holder.js/100x64/auto/ink"/>
+			<img src="<?=events_getImage($currentEvent, 'small')?>"/>
 			<b class="quarter-space">
 				<a href="<?=events_viewEvent($currentEvent)?>">
 				<?=events_getName($currentEvent)?>
@@ -96,19 +99,19 @@ $(function(){
 	<h3 class="half-top-space">Events created (<?=$numberEventsCreated?>)</h3>
 	<div class="half-vertical-space">
 	<?if($numberEventsCreated>0){
-	foreach($ownEvents as $currentEvent){?>
-	<div class="half-vertical-space all-100">
-		<?if($isOwner){?>
+		foreach($ownEvents as $currentEvent){?>
+		<div class="half-vertical-space all-100">
+			<?if($isOwner){?>
 			<a href="event_delete.php?id=<?=$currentEvent['idEvent']?>"><i class="fa fa-trash"></i>&nbsp;</a>
+			<?}?>
+			<img src="<?=events_getImage($currentEvent, 'small')?>"/>
+			<b class="quarter-space">
+				<a href="<?=events_viewEvent($currentEvent)?>">
+				<?=events_getName($currentEvent)?>
+				</a>
+			</b>
+		</div>
 		<?}?>
-		<img src="holder.js/100x64/auto/ink"/>
-		<b class="quarter-space">
-			<a href="<?=events_viewEvent($currentEvent)?>">
-			<?=events_getName($currentEvent)?>
-			</a>
-		</b>
-	</div>
-	<?}?>
 	<?}else{?>
 		<p class="panel">This user has not created any public events :(</p>
 	<?}?>
@@ -117,7 +120,6 @@ $(function(){
 	<!-- END USER EVENTS -->
 </div>
 </div>
-
 <?
 	include('template/footer.php');
 ?>

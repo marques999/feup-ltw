@@ -8,14 +8,13 @@
 	$featuredEvent=events_randomEvent();
 	$upcomingEvents=events_listTopEvents(4);
 ?>
-
 <script>
 $(function(){
 	$('#nav_index').addClass('active');
 });
 </script>
-
 <div class="ink-grid vertical-space">
+<h3 class="slab">Featured Event</h3>
 <div class="panel half-vertical-space">
 	<div class="stage">
 		<img class="all-100 half-bottom-space" src="<?=events_getImage($featuredEvent,'original')?>">
@@ -26,10 +25,11 @@ $(function(){
 		<p><?=$featuredEvent['description']?></p>
 	</div>
 </div>
+<h3 class="slab half-vertical-space">Popular Events</h3>
 <div class="panel half-vertical-space">
 	<ul class="stage column-group half-gutters unstyled">
 		<?foreach($upcomingEvents as $currentEvent){?>
-		<li class="slide xlarge-25 large-33 medium-33 small-50 tiny-100">
+		<li class="slide xlarge-25 large-25 medium-50 small-50 tiny-100">
 			<img class="all-100 half-bottom-space" src="<?=events_getImage($currentEvent,'medium')?>">
 			<h4 class="no-margin"><a href="<?=events_viewEvent($currentEvent)?>">
 				<?=events_getName($currentEvent)?>
@@ -41,7 +41,6 @@ $(function(){
 	</ul>
 </div>
 </div>
-
 <?
 	include('template/footer.php')
 ?>

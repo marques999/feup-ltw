@@ -1,6 +1,5 @@
 <?
 	session_start();
-
 	include_once('../database/action.php');
 	include_once('../database/salt.php');
 	include_once('../database/users.php');

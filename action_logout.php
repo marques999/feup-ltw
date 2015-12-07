@@ -11,15 +11,8 @@
 		unset($_SESSION['userid']);
 	}
 
-	if (isset($_SERVER['HTTP_REFERER'])) {
-		$refererUrl = $_SERVER['HTTP_REFERER'];
-	}
-	else {
-		$refererUrl = 'index.php';
-	}
-
 	session_destroy();
-	header("Refresh: 3; URL=$refererUrl");
+	header("Refresh: 3; URL=index.php");
 ?>
 <div class="ink-grid push-center all-50 large-70 medium-80 small-100 tiny-100">
 <div class="column ink-alert block success">

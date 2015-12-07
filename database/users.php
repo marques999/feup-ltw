@@ -5,14 +5,15 @@
 		'name' => 'Troll Face',
 		'email' => 'nobody@loves.me',
 		'location' => 'Beijing',
-		'country' => 'cn');
+		'country' => 'cn'
+	);
 
 	$stmt = $db->prepare('SELECT idUser, username FROM Users');
 	$stmt->execute();
 	$allUsers = array();
 	$allUsers[0] = $defaultUser;
 
-	while(($result = $stmt->fetch()) != null) {
+	while (($result = $stmt->fetch()) != null) {
 		$allUsers[$result['idUser']] = $result;
 	}
 
@@ -25,13 +26,16 @@
 	}
 
 	function users_getNextId() {
+
 		global $db;
 		$stmt = $db->prepare("SELECT * FROM SQLITE_SEQUENCE WHERE name='Users'");
 		$stmt->execute();
 		$result = $stmt->fetch();
+
 		if ($result != false && is_array($result)) {
 			return $result['seq'];
 		}
+
 		return -1;
 	}
 
@@ -43,6 +47,21 @@
 
 		$countryString = getCountry($userData['country']);
 		return "{$userData['location']}, $countryString";
+	}
+
+	function users_fileUploaded() {
+
+		if (empty($_FILES)) {
+			return false;
+		}
+
+		$fileName = $_FILES['image'];
+
+		if (!file_exists($fileName['tmp_name']) || !is_uploaded_file($fileName['tmp_name'])) {
+			return false;
+		}
+
+		return true;
 	}
 
 	function users_getCountryFlag($userData) {
@@ -67,7 +86,8 @@
 		}
 
 		$user_id = safe_getId($userData, 'idUser');
-		return glob("img/avatars/$user_id.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
+		$avatarLocation = glob("img/avatars/{$user_id}.{jpg,jpeg,gif,png}", GLOB_BRACE);
+		return $avatarLocation != false ? $avatarLocation[0] : "holder.js/200x200/auto/ink";
 	}
 
 	function users_getSmallAvatar($user_id) {
@@ -78,7 +98,8 @@
 			$user_id = 0;
 		}
 
-		return glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE)[0];
+		$avatarLocation = glob("img/avatars/{$user_id}_small.{jpg,jpeg,gif,png}", GLOB_BRACE);
+		return $avatarLocation != false ? $avatarLocation[0] : "holder.js/64x64/auto/ink";
 	}
 
 	function users_viewProfile($user_id) {
@@ -93,13 +114,16 @@
 	}
 
 	function numberUsers() {
+
 		global $db;
 		$stmt = $db->prepare('SELECT COUNT(*) AS count FROM Users');
 		$stmt->execute();
 		$result = $stmt->fetchAll();
+
 		if ($result != false && is_array($result) && count($result) > 0) {
 			 return $result[0]['count'];
 		}
+
 		return 0;
 	}
 
@@ -129,6 +153,7 @@
 	}
 
 	function users_listOwnEvents($user_id, $private) {
+
 		global $db;
 
 		if ($private) {
@@ -188,17 +213,20 @@
 	}
 
 	function users_countInvites($user_id) {
+
 		global $db;
 		$stmt = $db->prepare('SELECT COUNT(Invites.idEvent) AS count FROM Invites
-				INNER JOIN Users
-				ON Invites.idUser = :idUser
-				AND Users.idUser = Invites.idUser');
+			INNER JOIN Users
+			ON Invites.idUser = :idUser
+			AND Users.idUser = Invites.idUser');
 		$stmt->bindParam(':idUser', $user_id, PDO::PARAM_INT);
 		$stmt->execute();
 		$result = $stmt->fetchAll();
-		if (is_array($result) && count($result) > 0) {
+
+		if ($result != false && is_array($result) && count($result) > 0) {
 			 return $result[0]['count'];
 		}
+
 		return 0;
 	}
 
@@ -247,13 +275,16 @@
 		$stmt->bindParam(':username', $safeUsername, PDO::PARAM_STR);
 		$stmt->execute();
 		$result = $stmt->fetchAll();
+
 		if ($result != false && is_array($result) && count($result) > 0) {
 			$result = $result[0];
 			$correctHash = $result['password'];
-			if(validate_password($password, $correctHash)){
+
+			if (validate_password($password, $correctHash)) {
 				return $result['idUser'];
 			}
 		}
+
 		return 0;
 	}
 ?>

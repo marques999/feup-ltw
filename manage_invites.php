@@ -4,21 +4,18 @@
 	include_once('database/users.php');
 	include('template/header.php');
 ?>
-
 <script>
 $(function(){
 	$('#nav_events').addClass('active');
 });
 </script>
-
 <?if($loggedIn){
 	$myEvents=users_listInvites($thisUser);
 	$eventParticipants=events_countParticipants();
 	$numberInvites=count($myEvents);
 ?>
-
 <script>
-$(function() {
+$(function(){
 	$('button.accept').each(function() {
 		$(this).click(function(evt) {
 		$.ajax({
@@ -52,10 +49,9 @@ $(function() {
 	});
 });
 </script>
-
-<div class="ink-grid">
-<div class="column-group half-vertical-space">
-	<h3 class="slab half-vertical-space">My Invites</h3>
+<div class="ink-grid all-100">
+<div class="column-group">
+	<h3 class="slab">My Invites</h3>
 	<ul class="column-group unstyled">
 	<?if($numberInvites>0){
 	foreach($myEvents as $currentEvent){
@@ -66,10 +62,10 @@ $(function() {
 	}else{
 		$sender=$defaultUser;
 	}?>
-	<li class="slide all-25 large-33 medium-50 small-100 tiny-100">
+	<li class="all-25 large-33 medium-50 small-100 tiny-100">
 	<div class="panel half-right-space">
 		<img class="all-100" src="<?=events_getImage($currentEvent, 'medium')?>"/>
-		<div class="all-100 half-vertical-space">
+		<div class="quarter-vertical-space">
 			<b class="half-vertical-space">
 				<a href="view_event.php?id=<?=$eventId?>">
 					<?=events_getName($currentEvent)?>

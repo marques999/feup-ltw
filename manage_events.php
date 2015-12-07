@@ -21,9 +21,12 @@ $(function(){
 	$numberOwnEvents=count($myEvents);
 ?>
 <div class="ink-grid all-100">
-<div class="column-group gutters half-vertical-space">
+<div class="column-group gutters">
 <div class="column all-50 medium-100 small-100 tiny-100">
 	<h3 class="slab half-vertical-space">My Events</h3>
+	<p><small>
+	<a href="event_create.php" class="ink-button"><i class="fa fa-plus"></i> New Event</a>
+	</small></p>
 	<?if($numberOwnEvents>0){?>
 	<ul class="column-group unstyled">
 	<?foreach($myEvents as $currentEvent){
@@ -34,7 +37,7 @@ $(function(){
 	<li class="all-50 small-100 tiny-100">
 	<div class="panel half-right-space">
 		<img class="all-100" src="<?=events_getImage($currentEvent, 'medium')?>"/>
-		<div class="all-100 half-vertical-space">
+		<div class="all-100 quarter-vertical-space">
 			<b class="half-vertical-space">
 				<a href="view_event.php?id=<?=$eventId?>"><?=events_getName($currentEvent)?></a>
 			</b>
@@ -52,7 +55,7 @@ $(function(){
 				</small>
 			</p>
 			<p class="no-margin">
-				<small><a href="event_update.php?id<?=$eventId?>" class="ink-button"><i class="fa fa-pencil"></i> Edit</a></small>
+				<small><a href="event_update.php?id=<?=$eventId?>" class="ink-button"><i class="fa fa-pencil"></i> Edit</a></small>
 				<small><a href="event_delete.php?id=<?=$eventId?>" class="ink-button"><i class="fa fa-remove"></i> Remove</a></small>
 			</p>
 		</div>
@@ -75,7 +78,7 @@ $(function(){
 	?>
 	<li class="all-33 large-50 medium-33 small-50 tiny-50">
 	<div class="panel half-right-space">
-		<img class="all-100" src="<?=events_getImage($currentEvent, 'small')?>"/>
+		<img class="all-100" src="<?=events_getImage($currentEvent, 'medium')?>"/>
 		<div class="all-100 half-vertical-space">
 			<b class="half-vertical-space">
 				<a href="view_event.php?id=<?=$eventId?>">
@@ -108,7 +111,6 @@ $(function(){
 </div>
 <?}else{
 	include_once('message_guest.php');
-}?>
-<?
-	include('template/footer.php');
+}
+include('template/footer.php');
 ?>

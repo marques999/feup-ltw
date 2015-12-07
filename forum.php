@@ -8,13 +8,11 @@
 	$numberReplies=forum_countReplies();
 	$lastReplies=forum_lastReplies();
 ?>
-
 <script>
 $(function(){
 	$('#nav_forum').addClass('active');
 });
 </script>
-
 <?if($loggedIn){?>
 <div class="ink-grid push-center all-100">
 <p><small>
@@ -37,9 +35,11 @@ $(function(){
 	if($hasReplies){
 		$lastPosterId=$lastReplies[$threadId]['idUser'];
 		$lastPoster=$allUsers[$lastPosterId];
+		$lastReply=$lastReplies[$threadId];
 	}else{
 		$lastPosterId=$threadUser;
 		$lastPoster=$allUsers[$lastPosterId];
+		$lastReply=$currentThread;
 	}
 	if($threadId<0){
 		$threadId=0;
@@ -66,7 +66,7 @@ $(function(){
 		<td>
 			<i class="fa fa-user"></i>
 			<a href="<?=users_viewProfile($lastPosterId)?>"><?=$lastPoster['username']?></a>
-			<p><small><?=forum_printDate($lastReplies[$threadId])?></small></p>
+			<p><small><?=forum_printDate($lastReply)?></small></p>
 		</td>
 	</tr>
 <?}?>
@@ -75,7 +75,6 @@ $(function(){
 </div>
 <?}else{
 	include_once('message_guest.php');
-}?>
-<?
-	include('template/footer.php');
+}
+include('template/footer.php');
 ?>

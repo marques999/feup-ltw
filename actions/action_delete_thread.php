@@ -19,7 +19,7 @@
 
 			if (is_array($thread) && count($thread) > 0) {
 
-				$thread=$thread[0];
+				$thread = $thread[0];
 
 				if($thread['idUser'] == $thisUser) {
 

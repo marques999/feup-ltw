@@ -5,7 +5,8 @@
 
 	include_once('../database/action.php');
 	include_once('../database/events.php');
-	include_once('../database/users.php');	
+	include_once('../database/photos.php');
+	include_once('../database/users.php');
 	include_once('../database/session.php');
 
 	if (isset($_POST['idEvent'])) {
@@ -27,7 +28,6 @@
 			safe_redirect("../view_event.php?id=$eventId");
 		}
 
-		// update event name
 		$validOperation = false;
 		$hasName = isset($_POST['name']);
 
@@ -43,34 +43,30 @@
 			$stmt->execute();
 		}
 
-		// update event description
-		$validOperation = false;
 		$hasDescription = isset($_POST['description']);
 
 		if ($hasDescription) {
 			$newDescription = safe_trim($_POST['description']);
-			$validOperation = ($newDescription != $currentEvent['description']);
 		}
 
-		if ($validOperation) {
+		if ($hasDescription && $newDescription != $currentEvent['description']) {
 			$stmt = $db->prepare('UPDATE Events SET description = :description WHERE idEvent = :idEvent');
 			$stmt->bindParam(':description', $newDescription, PDO::PARAM_STR);
 			$stmt->bindParam(':idEvent', $eventId, PDO::PARAM_INT);
 			$stmt->execute();
 		}
 
-		// update event location
 		$hasLocation = isset($_POST['location']);
 
 		if ($hasLocation && $_POST['location'] != $currentEvent['location']) {
+			$tempLocation = trim($_POST['location'], '()');
+			$newLocation = safe_trim($tempLocation);
 			$stmt = $db->prepare('UPDATE Events SET location = :location WHERE idEvent = :idEvent');
-			$stmt->bindParam(':location', $_POST['location'], PDO::PARAM_STR);
+			$stmt->bindParam(':location', $newLocation, PDO::PARAM_STR);
 			$stmt->bindParam(':idEvent', $eventId, PDO::PARAM_INT);
 			$stmt->execute();
 		}
 
-		// update event type
-		$validOperation = false;
 		$hasType = isset($_POST['type']);
 		$hasCustomType = isset($_POST['custom-type']);
 
@@ -88,11 +84,16 @@
 			$stmt->bindParam(':type', $newType, PDO::PARAM_STR);
 			$stmt->bindParam(':idEvent', $eventId, PDO::PARAM_INT);
 			$stmt->execute();
-		}	
+		}
 
-		// update event date and time
 		$hasDatetime = isset($_POST['date']) && isset($_POST['hours']) && isset($_POST['minutes']);
-		$newDate = 0;
+
+		if ($hasDatetime) {
+			$newHours = safe_getId($_POST, 'hours');
+			$newMinutes = safe_getId($_POST, 'minutes');
+			$newDay = safe_trim($_POST['date']);
+			$newDate = strtotime("$newDay {$newHours}:{$newMinutes} GMT");
+		}
 
 		if ($hasDatetime && $newDate != $currentEvent['date']) {
 			$stmt = $db->prepare('UPDATE Events SET date = :date WHERE idEvent = :idEvent');
@@ -101,9 +102,37 @@
 			$stmt->execute();
 		}
 
-		// update event photo (maybe?)
+		if (users_fileUploaded()) {
+			$baseFilename = basename($_FILES['image']['name']);
+			$fileExtension = strtolower(substr($baseFilename, strrpos($baseFilename, '.') + 1));
+			$outputFilename = "{$eventId}.{$fileExtension}";
+			$uploadDirectory = '../img/events/';
+			$uploadFile = "{$uploadDirectory}{$outputFilename}";
+			$smallFile = "{$uploadDirectory}{$eventId}_small.{$fileExtension}";
+			$mediumFile = "{$uploadDirectory}{$eventId}_medium.{$fileExtension}";
+			array_map('unlink', glob("../img/events/{$eventId}.{jpg,jpeg,gif,png}", GLOB_BRACE));
+	
+			if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)){
+				header("Location: ../message_photo.php");
+			}
+
+			$originalImage = image_readFile($uploadFile, $fileExtension);
+
+			if ($originalImage == null) {
+				header("Location: ../message_photo.php");
+			}
+
+			$mediumImage = image_advancedcrop($originalImage, 400, 256, $fileExtension);
+			$smallImage = image_resize($mediumImage, 200, $fileExtension);
+			array_map('unlink', glob("../img/events/{$eventId}_small.{jpg,jpeg,gif,png}", GLOB_BRACE));
+			array_map('unlink', glob("../img/events/{$eventId}_medium.{jpg,jpeg,gif,png}", GLOB_BRACE));
+			image_writeFile($mediumImage, $mediumFile, $fileExtension);
+			image_writeFile($smallImage, $smallFile, $fileExtension);
+			imagedestroy($originalImage);
+			imagedestroy($mediumImage);
+			imagedestroy($smallImage);
+		}
 	}
-	else {
-		safe_redirect("../view_event.php?id=$eventId");
-	}
+
+	header("Location: ../view_event.php?id=$eventId");
 ?>

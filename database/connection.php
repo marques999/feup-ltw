@@ -18,14 +18,8 @@
 		return isset($array[$id]) && !empty($array[$id]);
 	}
 	function safe_trim($text, $tags = '') {
-		preg_match_all('/<(.+?)[\s]*\/?[\s]*>/si', trim($tags), $tags);
-		$tags = array_unique($tags[1]);
-
-		if (is_array($tags) && count($tags) > 0) {
-			return preg_replace('@<(?!(?:'. implode('|', $tags) .')\b)(\w+)\b.*?>.*?</\1>@si', '', $text);
-		}
-
 		$workingString = preg_replace('@<(\w+)\b.*?>.*?</\1>@si', '', $text);
-		return htmlspecialchars(trim($workingString));
+		$workingString = preg_replace('!\s+!', ' ', $workingString);
+		return htmlspecialchars($workingString);
 	}
 ?>

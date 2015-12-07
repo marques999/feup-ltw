@@ -4,7 +4,7 @@
 	}
 
 	include_once('../database/action.php');
-	include_once('../database/country.php');
+	include_once('../database/photos.php');
 	include_once('../database/salt.php');
 	include_once('../database/users.php');
 
@@ -75,20 +75,46 @@
 				$stmt->bindParam(':country', $_POST['country'], PDO::PARAM_STR);
 			}
 		}
+		else if ($changedField == 5 && users_fileUploaded()) {
+			$uploadDirectory = '../img/avatars/';
+			$baseFilename = basename($_FILES['image']['name']);
+			$fileExtension = strtolower(substr($baseFilename, strrpos($baseFilename, '.') + 1));
+			$outputFilename = "{$userId}_original.{$fileExtension}";
+			$uploadFile = $uploadDirectory . $outputFilename;
+			$smallFile = "../img/avatars/{$userId}_small.{$fileExtension}";
+			$mediumFile = "../img/avatars/{$userId}.{$fileExtension}";
+			array_map('unlink', glob("../img/avatars/{$userId}_original.{jpg,jpeg,gif,png}", GLOB_BRACE));
+	
+			if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)){
+				header("Location: message_photo.php");
+			}
+
+			$originalImage = image_readFile($uploadFile, $fileExtension);
+
+			if ($originalImage == null) {
+				header("Location: ../message_photo.php");
+			}
+
+			$resizedImage = image_resize($originalImage, 500, $fileExtension);
+			$thumbnailImage = image_crop($resizedImage, 64, 64);
+			array_map('unlink', glob("../img/avatars/{$userId}.{jpg,jpeg,gif,png}", GLOB_BRACE));
+			array_map('unlink', glob("../img/avatars/{$userId}_small.{jpg,jpeg,gif,png}", GLOB_BRACE));
+			image_writeFile($resizedImage, $mediumFile, $fileExtension);
+			image_writeFile($thumbnailImage, $smallFile, $fileExtension);
+			imagedestroy($originalImage);
+			imagedestroy($resizedImage);
+			imagedestroy($thumbnailImage);
+		}
 
 		if ($validOperation) {
 
 			$stmt->bindParam(':idUser', $userId, PDO::PARAM_INT);
 
-			if ($stmt->execute()) {
-				header("Location: ../view_profile.php?id=$userId");
-			}
-			else {
+			if (!$stmt->execute()) {
 				header("Location: ../database_error.php");
 			}
-		}
-		else {
-			safe_redirect("../index.php");
+
+			header("Location: ../view_profile.php?id=$userId");
 		}
 	}
 	else {

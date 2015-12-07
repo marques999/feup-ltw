@@ -4,36 +4,39 @@
 	include_once('database/comments.php');
 	include_once('database/users.php');
 
-	$thisEvent = $defaultEvent;
-	$eventId = 0;
-	$startId = 0;
-
 	if (safe_check($_POST, 'eventId')) {
 		$eventId = safe_getId($_POST,'eventId');
 		$thisComments = listCommentsByEvent($eventId);
 		$numberCommentsPage = 5;
 		$numberComments = count($thisComments);
 	}
-
-	if(isset($_POST['startId'])){	
-		$startId=safe_getId($_POST,'startId');
-		$remainingComments=$numberComments-$startId;
-		if($remainingComments<5){
-			$numberCommentsPage=$remainingComments;
-		}
+	else {
+		$thisEvent = $defaultEvent;
+		$eventId = 0;
 	}
 
-	for($i=$startId;$i<$startId+$numberCommentsPage;$i++){
-		$currentComment=$thisComments[$i];
-		if(safe_check($currentComment, 'idUser')){
+	if (isset($_POST['startId'])) {
+		$startId = safe_getId($_POST,'startId');
+		$remainingComments = $numberComments-$startId;
+		if ($remainingComments < 5) {
+			$numberCommentsPage = $remainingComments;
+		}
+	}
+	else {
+		$startId = 0;
+	}
+
+	for($i = $startId; $i < $startId + $numberCommentsPage; $i++) {
+		$currentComment = $thisComments[$i];
+		if(safe_check($currentComment, 'idUser')) {
 			$commentAuthorId = $currentComment['idUser'];
 		}
-		else{
+		else {
 			$commentAuthorId = 0;
 		}
-		$commentAuthor=$allUsers[$commentAuthorId];?>
+		$commentAuthor = $allUsers[$commentAuthorId];?>
 		<div class="column all-100 half-vertical-space">
-			<img class="push-left half-right-space" src="<?=users_getSmallAvatar($commentAuthorId)?>"/>
+			<img class="push-left quarter-bottom-space half-right-space" src="<?=users_getSmallAvatar($commentAuthorId)?>"/>
 			<a href="<?=users_viewProfile($commentAuthorId)?>"><?=$commentAuthor['username']?></a>
 			<small><?=gmdate("l, d/m/Y H:i", $currentComment['timestamp'])?></small>
 			<p class="fw-medium"><?=$currentComment['message']?></p>
