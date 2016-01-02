@@ -10,7 +10,7 @@ $(function(){
 });
 </script>
 <?if($loggedIn){?>
-<script src="js/gmaps.min.js"></script>
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyAObn6F3iTncHgv8HrByEfgnlAbNSnfPOE"></script>
 <script src="js/imgcentering.min.js"></script>
 <script src="event_create.js"></script>
 <script src="upload_photo.js"></script>

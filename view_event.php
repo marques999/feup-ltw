@@ -70,7 +70,7 @@
 </div>
 <?}else{?>
 <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-565c6b43113a666a" async="async"></script>
-<script src="js/gmaps.min.js"></script>
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyAObn6F3iTncHgv8HrByEfgnlAbNSnfPOE"></script>
 <script src="view_event.js"></script>
 <script>
 var startId=0;
